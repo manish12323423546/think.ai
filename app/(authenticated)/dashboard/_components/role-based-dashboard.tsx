@@ -7,46 +7,55 @@ import { ProducerDashboard } from "./dashboards/producer-dashboard"
 import { StoryboardArtistDashboard } from "./dashboards/storyboard-artist-dashboard"
 import { DirectorDashboard } from "./dashboards/director-dashboard"
 import { TeamMemberDashboard } from "./dashboards/team-member-dashboard"
+import { redirect } from "next/navigation"
+
+interface UserMetadata {
+  role?: Roles
+  permissions?: string[]
+  projects?: string[]
+}
 
 interface UserData {
   name: string
   email: string
   avatar: string
-  role: Roles
+  role: Roles | null
   permissions: string[]
   userId: string
-  unsafeMetadata?: any
-  publicMetadata?: any
+  unsafeMetadata?: UserMetadata
+  publicMetadata?: UserMetadata
 }
 
-export function RoleBasedDashboard({ userData }: { userData: UserData }) {
-  // Route to the appropriate dashboard based on user role
+interface RoleBasedDashboardProps {
+  userData: UserData
+}
+
+export function RoleBasedDashboard({ userData }: RoleBasedDashboardProps) {
+  // If no role is assigned, redirect to role selection
+  if (!userData.role) {
+    redirect("/role-selection")
+  }
+
+  // Create a user data object with guaranteed non-null role for dashboard components
+  const dashboardUserData = {
+    ...userData,
+    role: userData.role as Roles // Safe to cast since we checked above
+  }
+
   switch (userData.role) {
-    case 'admin':
-      return <AdminDashboard userData={userData} />
-    case 'writer':
-      return <WriterDashboard userData={userData} />
-    case 'producer':
-      return <ProducerDashboard userData={userData} />
-    case 'storyboard_artist':
-      return <StoryboardArtistDashboard userData={userData} />
-    case 'director':
-      return <DirectorDashboard userData={userData} />
-    case 'team_member':
-      return <TeamMemberDashboard userData={userData} />
+    case "admin":
+      return <AdminDashboard userData={dashboardUserData} />
+    case "writer":
+      return <WriterDashboard userData={dashboardUserData} />
+    case "producer":
+      return <ProducerDashboard userData={dashboardUserData} />
+    case "storyboard_artist":
+      return <StoryboardArtistDashboard userData={dashboardUserData} />
+    case "director":
+      return <DirectorDashboard userData={dashboardUserData} />
+    case "team_member":
+      return <TeamMemberDashboard userData={dashboardUserData} />
     default:
-      // Default fallback - show a basic dashboard
-  return (
-    <div className="space-y-8">
-      <div className="space-y-2">
-            <h1 className="text-3xl font-bold tracking-tight">
-              Welcome to Your Dashboard
-            </h1>
-            <p className="text-muted-foreground">
-              Welcome back, {userData.name}! Please select a role to continue.
-            </p>
-      </div>
-    </div>
-  )
+      redirect("/role-selection")
   }
 } 

@@ -3,7 +3,7 @@
 import { motion } from "framer-motion"
 import { 
   Palette, 
-  Image, 
+  Image as ImageIcon, 
   Layers, 
   Brush,
   Camera,
@@ -121,7 +121,7 @@ export function StoryboardArtistDashboard({ userData }: StoryboardArtistDashboar
           </Button>
           <Button variant="outline" className="w-full justify-start" asChild>
             <Link href="/dashboard/assets">
-              <Image className="mr-2 h-4 w-4" />
+              <ImageIcon className="mr-2 h-4 w-4" />
               Browse Asset Library
             </Link>
           </Button>

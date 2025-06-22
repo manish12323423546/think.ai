@@ -281,7 +281,7 @@ export function DirectorDashboard({ userData }: DirectorDashboardProps) {
                   </div>
                   <div className="text-right">
                     <p className="text-xs text-muted-foreground">{decision.time}</p>
-                    <Badge size="sm" variant={decision.impact === 'High' ? 'default' : 'secondary'}>
+                    <Badge variant={decision.impact === 'High' ? 'default' : 'secondary'}>
                       {decision.impact}
                     </Badge>
                   </div>

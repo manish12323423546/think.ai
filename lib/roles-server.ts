@@ -2,7 +2,7 @@ import { auth } from "@clerk/nextjs/server"
 import { clerkClient } from "@clerk/nextjs/server"
 import { currentUser } from "@clerk/nextjs/server"
 import { Roles } from "@/types/globals"
-import { ROLE_PERMISSIONS } from "./roles"
+import { ROLE_PERMISSIONS, type Permission } from "./roles"
 
 // Server-side role checking
 export async function checkRole(role: Roles) {
@@ -16,7 +16,8 @@ export async function checkPermission(permission: string) {
   const userRole = (sessionClaims?.unsafeMetadata?.role || sessionClaims?.metadata?.role) as Roles
   if (!userRole) return false
   
-  return ROLE_PERMISSIONS[userRole]?.includes(permission as any) || false
+  const userPermissions = ROLE_PERMISSIONS[userRole] || []
+  return (userPermissions as readonly string[]).includes(permission)
 }
 
 export async function getCurrentUserRole(): Promise<Roles | null> {

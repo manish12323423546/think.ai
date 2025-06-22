@@ -7,6 +7,12 @@ import { Loader2 } from "lucide-react"
 import { RoleBasedDashboard } from "./role-based-dashboard"
 import { Roles } from "@/types/globals"
 
+interface UserMetadata {
+  role?: Roles
+  permissions?: string[]
+  projects?: string[]
+}
+
 interface UserData {
   name: string
   email: string
@@ -14,8 +20,8 @@ interface UserData {
   role: Roles | null
   permissions: string[]
   userId: string
-  unsafeMetadata: any
-  publicMetadata: any
+  unsafeMetadata?: UserMetadata
+  publicMetadata?: UserMetadata
 }
 
 export function DashboardClient({ userData }: { userData: UserData }) {
