@@ -74,6 +74,9 @@ importers:
       react-markdown:
         specifier: ^10.1.0
         version: 10.1.0(@types/react@19.1.8)(react@19.1.0)
+      rehype-sanitize:
+        specifier: ^5.0.1
+        version: 5.0.1
       remark-gfm:
         specifier: ^4.0.1
         version: 4.0.1
@@ -8270,6 +8273,8 @@ snapshots:
       get-proto: 1.0.1
       gopd: 1.2.0
       set-function-name: 2.0.2
+
+  rehype-sanitize@5.0.1: {}
 
   remark-gfm@4.0.1:
     dependencies:
