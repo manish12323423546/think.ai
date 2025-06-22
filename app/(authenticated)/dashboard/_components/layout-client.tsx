@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/sidebar"
 import { usePathname } from "next/navigation"
 import { AppSidebar } from "./app-sidebar"
+import { Roles } from "@/types/globals"
 
 export default function DashboardClientLayout({
   children,
@@ -27,6 +28,9 @@ export default function DashboardClientLayout({
     email: string
     avatar: string
     membership: string
+    role: Roles
+    permissions: string[]
+    userId: string
   }
 }) {
   const pathname = usePathname()
@@ -44,90 +48,61 @@ export default function DashboardClientLayout({
   const defaultOpen = savedState === null ? true : savedState === "true"
 
   const getBreadcrumbs = () => {
-    const paths = pathname.split("/").filter(Boolean)
-    const breadcrumbs = []
+    const pathSegments = pathname.split("/").filter(Boolean)
+    const breadcrumbs: Array<{
+      name: string
+      href: string
+      current: boolean
+    }> = []
 
-    if (paths[0] === "dashboard") {
-      breadcrumbs.push({ name: "Dashboard", href: "/dashboard" })
+    // Add Dashboard as root
+    breadcrumbs.push({
+      name: "Dashboard",
+      href: "/dashboard",
+      current: pathname === "/dashboard"
+    })
 
-      if (paths[1]) {
-        const pageName = paths[1].charAt(0).toUpperCase() + paths[1].slice(1)
+    // Build breadcrumbs from path segments
+    if (pathSegments.length > 1) {
+      let currentPath = ""
+      
+      for (let i = 1; i < pathSegments.length; i++) {
+        const segment = pathSegments[i]
+        currentPath += `/${segment}`
+        const fullPath = `/dashboard${currentPath}`
+        
+        // Format segment name
+        let segmentName = segment
+          .split("-")
+          .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+          .join(" ")
 
-        if (paths[1] === "tracks" && paths[2]) {
-          // Add Tracks breadcrumb
-          breadcrumbs.push({ name: "Tracks", href: "/dashboard/tracks" })
-
-          // Add specific track breadcrumb
-          // For now, we'll use a placeholder. In a real app, you'd fetch the track name
-          const trackNames: Record<string, string> = {
-            "ai-engineer": "AI Engineer Track",
-            "full-stack": "Full Stack Developer Track",
-            "data-scientist": "Data Scientist Track"
-          }
-          const trackName = trackNames[paths[2]] || "Track Details"
-          breadcrumbs.push({ name: trackName, href: pathname, current: true })
-        } else if (paths[1] === "courses") {
-          breadcrumbs.push({ name: "Courses", href: "/dashboard/courses" })
-
-          // Handle course detail pages
-          if (paths[2]) {
-            // Format course slug to readable name
-            const courseName = paths[2]
-              .split("-")
-              .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-              .join(" ")
-
-            // Check if we're on a section or lesson page
-            if (paths[3]) {
-              // Add course breadcrumb
-              breadcrumbs.push({
-                name: courseName,
-                href: `/dashboard/courses/${paths[2]}`
-              })
-
-              // Add section name (formatted from slug)
-              const sectionName = paths[3]
-                .split("-")
-                .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-                .join(" ")
-
-              if (paths[4]) {
-                // We're on a lesson page
-                breadcrumbs.push({
-                  name: sectionName,
-                  href: `/dashboard/courses/${paths[2]}/${paths[3]}`
-                })
-
-                // Add lesson name (formatted from slug)
-                const lessonName = paths[4]
-                  .split("-")
-                  .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-                  .join(" ")
-                breadcrumbs.push({
-                  name: lessonName,
-                  href: pathname,
-                  current: true
-                })
-              } else {
-                // We're on a section page
-                breadcrumbs.push({
-                  name: sectionName,
-                  href: pathname,
-                  current: true
-                })
-              }
-            } else {
-              // Just course detail page
-              breadcrumbs.push({
-                name: courseName,
-                href: pathname,
-                current: true
-              })
-            }
-          }
-        } else {
-          breadcrumbs.push({ name: pageName, href: pathname, current: true })
+        // Handle special cases
+        if (segment === "account") {
+          segmentName = "Account Settings"
+        } else if (segment === "billing") {
+          segmentName = "Billing & Subscription"
+        } else if (segment === "support") {
+          segmentName = "Support & Help"
+        } else if (segment === "scripts") {
+          segmentName = "Script Editor"
+        } else if (segment === "storyboards") {
+          segmentName = "Storyboards"
+        } else if (segment === "projects") {
+          segmentName = "Projects"
+        } else if (segment === "analytics") {
+          segmentName = "Analytics"
+        } else if (segment === "admin") {
+          segmentName = "Admin Panel"
         }
+
+        const isLast = i === pathSegments.length - 1
+        
+        breadcrumbs.push({
+          name: segmentName,
+          href: fullPath,
+          current: isLast
+        })
       }
     }
 

@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button"
 import { AnimatePresence, motion } from "framer-motion"
-import { ArrowRight } from "lucide-react"
+import { ArrowRight, Film } from "lucide-react"
 import Link from "next/link"
 import { useState } from "react"
 
@@ -23,19 +23,16 @@ export function StickyCTA() {
             <div className="flex items-center justify-between gap-3">
               <div className="flex-1">
                 <p className="text-muted-foreground text-xs font-medium">
-                  Love this template?
+                  Ready to streamline pre-production?
                 </p>
                 <p className="text-foreground text-sm font-semibold">
-                  Star us on GitHub!
+                  Start your film project today!
                 </p>
               </div>
               <Button size="sm" asChild className="group">
-                <Link
-                  href="https://github.com/mckaywrigley/mckays-app-template"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  Start Building
+                <Link href="/signup">
+                  <Film className="mr-1 h-3 w-3" />
+                  Start Free Trial
                   <ArrowRight className="ml-1 h-3 w-3 transition-transform group-hover:translate-x-1" />
                 </Link>
               </Button>
@@ -84,24 +81,21 @@ export function StickyCTA() {
             <div className="space-y-4">
               <div>
                 <p className="text-muted-foreground text-sm font-medium">
-                  Love this template?
+                  Ready to revolutionize your workflow?
                 </p>
                 <p className="text-foreground text-lg font-bold">
-                  Star us on GitHub!
+                  Start your film project with AI!
                 </p>
               </div>
               <Button asChild className="group w-full">
-                <Link
-                  href="https://github.com/mckaywrigley/mckays-app-template"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  Start Building
+                <Link href="/signup">
+                  <Film className="mr-2 h-4 w-4" />
+                  Start Free Trial
                   <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
                 </Link>
               </Button>
               <p className="text-muted-foreground text-center text-xs">
-                The #1 Full Stack App Template
+                AI-Powered Film Pre-Production Platform
               </p>
             </div>
           </motion.div>

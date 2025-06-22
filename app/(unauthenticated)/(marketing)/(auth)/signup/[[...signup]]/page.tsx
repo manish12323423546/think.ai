@@ -2,20 +2,73 @@
 
 import { SignUp } from "@clerk/nextjs"
 import { dark } from "@clerk/themes"
-import { Star, Users, BookOpen, Trophy, CheckCircle } from "lucide-react"
+import { Star, Users, BookOpen, Trophy, CheckCircle, Film, Palette, Edit, Crown } from "lucide-react"
 import { useTheme } from "next-themes"
 import Link from "next/link"
 import { motion } from "framer-motion"
+import { useState } from "react"
+
+const roles = [
+  {
+    id: 'admin',
+    name: 'Admin/Owner',
+    description: 'Full access to all features and user management',
+    icon: Crown,
+    features: ['Complete project control', 'User management', 'Analytics & reporting', 'All modules access']
+  },
+  {
+    id: 'writer',
+    name: 'Writer',
+    description: 'Specialized in script writing and story development',
+    icon: Edit,
+    features: ['Script creation & editing', 'Story development tools', 'Collaboration features', 'Version control']
+  },
+  {
+    id: 'producer',
+    name: 'Producer',
+    description: 'Project management and oversight capabilities',
+    icon: Film,
+    features: ['Project creation', 'Team coordination', 'Budget tracking', 'Analytics access']
+  },
+  {
+    id: 'storyboard_artist',
+    name: 'Storyboard Artist',
+    description: 'Visual storytelling and storyboard creation',
+    icon: Palette,
+    features: ['Storyboard creation', 'Visual planning tools', 'Asset management', 'Collaboration features']
+  },
+  {
+    id: 'director',
+    name: 'Director',
+    description: 'Creative direction and project oversight',
+    icon: Trophy,
+    features: ['Creative oversight', 'Script review', 'Storyboard approval', 'Team coordination']
+  },
+  {
+    id: 'team_member',
+    name: 'Team Member',
+    description: 'General team access with view permissions',
+    icon: Users,
+    features: ['Project viewing', 'Basic collaboration', 'Task assignments', 'Communication tools']
+  }
+]
 
 export default function SignUpPage() {
   const { theme } = useTheme()
+  const [selectedRole, setSelectedRole] = useState<string>('')
+  const [showSignup, setShowSignup] = useState(false)
+
+  const handleRoleSelect = (roleId: string) => {
+    setSelectedRole(roleId)
+    setShowSignup(true)
+  }
 
   return (
     <div className="container mx-auto px-4 py-16">
-      <div className="mx-auto grid max-w-6xl items-center gap-12 lg:grid-cols-2 lg:gap-20">
-        {/* Left side - Benefits */}
+      <div className="mx-auto grid max-w-7xl items-start gap-12 lg:grid-cols-2 lg:gap-20">
+        {/* Left side - Role Selection */}
         <motion.div
-          className="hidden space-y-8 lg:block"
+          className="space-y-8"
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.5 }}
@@ -27,7 +80,7 @@ export default function SignUpPage() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.1 }}
             >
-              Build your next big idea
+              Choose Your Role
             </motion.h1>
             <motion.p
               className="text-muted-foreground text-lg"
@@ -35,185 +88,198 @@ export default function SignUpPage() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.2 }}
             >
-              Get instant access to a production-ready app template with
-              everything you need to launch quickly.
+              Select your role first, then complete the signup form. You can always change this later.
             </motion.p>
           </div>
 
-          {/* Feature grid */}
-          <div className="grid grid-cols-2 gap-4">
-            {[
-              {
-                icon: BookOpen,
-                title: "Full Stack Ready",
-                desc: "Complete setup included"
-              },
-              {
-                icon: Users,
-                title: "Authentication",
-                desc: "Clerk pre-configured"
-              },
-              {
-                icon: Trophy,
-                title: "Production Ready",
-                desc: "Launch immediately"
-              },
-              {
-                icon: Star,
-                title: "Modern Stack",
-                desc: "Next.js 15 + TypeScript"
-              }
-            ].map((feature, i) => (
+          {/* Role Cards */}
+          <div className="grid gap-4 sm:grid-cols-2">
+            {roles.map((role, index) => (
               <motion.div
-                key={feature.title}
-                className="bg-card rounded-lg border p-4"
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.4, delay: 0.3 + i * 0.1 }}
-                whileHover={{
-                  scale: 1.05,
-                  boxShadow: "0 10px 20px rgba(0,0,0,0.1)"
-                }}
+                key={role.id}
+                className={`border rounded-lg p-4 transition-all cursor-pointer group ${
+                  selectedRole === role.id 
+                    ? 'border-primary bg-primary/5 shadow-md ring-1 ring-primary/20' 
+                    : 'border-border hover:bg-accent/50 hover:border-primary/50 hover:shadow-md'
+                }`}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3, delay: index * 0.05 }}
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                onClick={() => handleRoleSelect(role.id)}
               >
-                <motion.div
-                  initial={{ rotate: -10 }}
-                  animate={{ rotate: 0 }}
-                  transition={{
-                    type: "spring",
-                    stiffness: 300,
-                    damping: 20,
-                    delay: 0.4 + i * 0.1
-                  }}
-                >
-                  <feature.icon className="text-primary mb-2 h-8 w-8" />
-                </motion.div>
-                <p className="text-sm font-semibold">{feature.title}</p>
-                <p className="text-muted-foreground text-xs">{feature.desc}</p>
+                <div className="flex items-start gap-3">
+                  <div className={`p-2 rounded-lg transition-colors ${
+                    selectedRole === role.id 
+                      ? 'bg-primary text-primary-foreground' 
+                      : 'bg-muted group-hover:bg-primary/10'
+                  }`}>
+                    <role.icon className="h-4 w-4" />
+                  </div>
+                  <div className="flex-1 space-y-2">
+                    <div className="flex items-center justify-between">
+                      <h3 className="font-semibold text-sm">{role.name}</h3>
+                      {selectedRole === role.id && (
+                        <CheckCircle className="h-4 w-4 text-primary" />
+                      )}
+                    </div>
+                    <p className="text-xs text-muted-foreground">{role.description}</p>
+                    <ul className="space-y-1">
+                      {role.features.slice(0, 2).map((feature, idx) => (
+                        <li key={idx} className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                          <CheckCircle className="h-3 w-3 text-primary" />
+                          {feature}
+                        </li>
+                      ))}
+                      {!showSignup && (
+                        <li className="flex items-center gap-1.5 text-xs text-primary font-medium mt-2 pt-2 border-t border-border/30">
+                          ✨ Click to start signup
+                        </li>
+                      )}
+                    </ul>
+                  </div>
+                </div>
               </motion.div>
             ))}
           </div>
 
-          {/* Social proof */}
-          <motion.div
-            className="space-y-4"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.7 }}
-          >
-            <div className="flex items-center gap-2">
-              <div className="flex">
-                {[...Array(5)].map((_, i) => (
-                  <motion.div
-                    key={i}
-                    initial={{ opacity: 0, scale: 0 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{
-                      type: "spring",
-                      stiffness: 500,
-                      damping: 15,
-                      delay: 0.8 + i * 0.05
-                    }}
-                  >
-                    <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                  </motion.div>
-                ))}
-              </div>
-              <span className="text-sm font-medium">4.9/5</span>
-              <span className="text-muted-foreground text-sm">
-                (1,200+ developers)
-              </span>
-            </div>
-            <div className="flex -space-x-2">
-              {[...Array(4)].map((_, i) => (
-                <motion.div
-                  key={i}
-                  className="border-background bg-muted h-8 w-8 rounded-full border-2"
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ duration: 0.3, delay: 0.9 + i * 0.05 }}
-                  whileHover={{ y: -2 }}
-                />
-              ))}
-              <motion.div
-                className="border-background bg-muted flex h-8 w-8 items-center justify-center rounded-full border-2 text-xs font-medium"
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.3, delay: 1.1 }}
-                whileHover={{ y: -2 }}
-              >
-                +2k
-              </motion.div>
-            </div>
-          </motion.div>
-
-          {/* Money-back guarantee */}
-          <motion.div
-            className="flex items-center gap-3 rounded-lg border border-green-200 bg-green-50 p-4 dark:border-green-800 dark:bg-green-950/20"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 1.2 }}
-            whileHover={{
-              scale: 1.02,
-              boxShadow: "0 4px 15px rgba(34, 197, 94, 0.2)"
-            }}
-          >
+          {!showSignup && (
             <motion.div
-              animate={{ scale: [1, 1.2, 1] }}
-              transition={{
-                duration: 2,
-                repeat: Infinity,
-                repeatType: "reverse"
-              }}
+              className="bg-muted rounded-lg p-4 space-y-3"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.5, delay: 0.4 }}
             >
-              <CheckCircle className="h-5 w-5 text-green-600 dark:text-green-400" />
+              <h4 className="font-semibold text-sm flex items-center gap-2">
+                <Star className="h-4 w-4 text-primary" />
+                Get Started
+              </h4>
+              <p className="text-xs text-muted-foreground">
+                Click on any role above to reveal the signup form and create your account with the right permissions.
+              </p>
             </motion.div>
-            <p className="text-sm font-medium">100% Free & Open Source</p>
-          </motion.div>
+          )}
         </motion.div>
 
-        {/* Right side - Sign up form */}
+        {/* Right side - Clerk Sign Up */}
         <motion.div
-          className="mx-auto w-full max-w-md lg:mx-0"
+          className="flex justify-center lg:justify-end"
           initial={{ opacity: 0, x: 20 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.5, delay: 0.2 }}
         >
-          <motion.div
-            className="mb-8 text-center lg:text-left"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.3 }}
-          >
-            <h2 className="mb-2 text-2xl font-semibold">Create account</h2>
-            <p className="text-muted-foreground text-sm">
-              Already have an account?{" "}
-              <motion.span
-                whileHover={{ scale: 1.05 }}
-                className="inline-block"
+          <div className="w-full max-w-md">
+            {!showSignup ? (
+              <motion.div
+                className="flex items-center justify-center h-96 border-2 border-dashed border-border rounded-lg"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.5 }}
               >
-                <Link
-                  href="/login"
-                  className="text-primary font-medium hover:underline"
+                <div className="text-center space-y-4">
+                  <div className="text-6xl">👈</div>
+                  <h3 className="text-lg font-semibold">Select Your Role First</h3>
+                  <p className="text-sm text-muted-foreground max-w-xs">
+                    Choose the role that best describes your responsibilities to customize your signup experience.
+                  </p>
+                </div>
+              </motion.div>
+            ) : (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.5, type: "spring", stiffness: 200 }}
+              >
+                <div className="mb-6 text-center">
+                  <h2 className="text-xl font-semibold mb-2">Create Your Account</h2>
+                  <p className="text-sm text-muted-foreground">
+                    Complete the form below to get started as a{" "}
+                    <span className="font-medium text-primary">
+                      {roles.find(r => r.id === selectedRole)?.name}
+                    </span>
+                  </p>
+                </div>
+                
+                <motion.div
+                  className="relative"
+                  initial={{ y: 20, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  transition={{ duration: 0.6, delay: 0.2 }}
                 >
-                  Sign in here
-                </Link>
-              </motion.span>
-            </p>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.4 }}
-          >
-            <SignUp
-              forceRedirectUrl="/dashboard"
-              signInUrl="/login"
-              appearance={{ baseTheme: theme === "dark" ? dark : undefined }}
-            />
-          </motion.div>
+                  <SignUp
+                    appearance={{
+                      baseTheme: theme === "dark" ? dark : undefined,
+                      variables: {
+                        colorPrimary: "#0070f3",
+                        colorBackground: theme === "dark" ? "#000000" : "#ffffff",
+                        colorText: theme === "dark" ? "#ffffff" : "#000000",
+                        colorInputBackground: theme === "dark" ? "#111111" : "#ffffff",
+                        colorInputText: theme === "dark" ? "#ffffff" : "#000000",
+                        borderRadius: "0.5rem"
+                      },
+                      elements: {
+                        formButtonPrimary: "bg-blue-600 hover:bg-blue-700 text-white",
+                        card: "shadow-lg border",
+                        headerTitle: theme === "dark" ? "text-white" : "text-black",
+                        headerSubtitle: theme === "dark" ? "text-gray-300" : "text-gray-600",
+                        socialButtonsIconButton: "border hover:bg-gray-100",
+                        formFieldInput: "border focus:border-blue-500",
+                        footerActionLink: "text-blue-600 hover:text-blue-700"
+                      }
+                    }}
+                    unsafeMetadata={{
+                      role: selectedRole
+                    }}
+                    afterSignUpUrl="/role-selection"
+                    redirectUrl="/role-selection"
+                  />
+                </motion.div>
+                
+                {selectedRole && (
+                  <motion.div 
+                    className="mt-4 p-3 bg-primary/10 rounded-lg border border-primary/20"
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.3, delay: 0.4 }}
+                  >
+                    <p className="text-xs text-muted-foreground text-center">
+                      🎯 You'll be set up as a <strong className="text-primary">{roles.find(r => r.id === selectedRole)?.name}</strong> with the right permissions
+                    </p>
+                  </motion.div>
+                )}
+                
+                <motion.button
+                  className="mt-4 text-xs text-muted-foreground hover:text-foreground transition-colors cursor-pointer w-full text-center"
+                  onClick={() => {
+                    setSelectedRole('')
+                    setShowSignup(false)
+                  }}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ duration: 0.3, delay: 0.6 }}
+                >
+                  ← Change role selection
+                </motion.button>
+              </motion.div>
+            )}
+          </div>
         </motion.div>
       </div>
+
+      <motion.div
+        className="mt-12 text-center"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.5, delay: 0.6 }}
+      >
+        <p className="text-muted-foreground text-sm">
+          Already have an account?{" "}
+          <Link href="/login" className="text-primary hover:text-primary/90 font-medium">
+            Sign in here
+          </Link>
+        </p>
+      </motion.div>
     </div>
   )
 }

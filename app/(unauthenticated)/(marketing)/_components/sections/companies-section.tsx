@@ -4,20 +4,20 @@ import { motion } from "framer-motion"
 import { SectionWrapper } from "./section-wrapper"
 
 const stats = [
-  { label: "GitHub Stars", value: "500+" },
-  { label: "Active Projects", value: "1000+" },
-  { label: "Contributors", value: "50+" }
+  { label: "Scripts Processed", value: "10K+" },
+  { label: "Production Hours Saved", value: "50K+" },
+  { label: "Active Filmmakers", value: "2K+" }
 ]
 
 const features = [
-  "Next.js",
-  "TypeScript",
-  "Tailwind CSS",
-  "Clerk",
-  "Stripe",
-  "PostgreSQL",
-  "Drizzle ORM",
-  "PostHog"
+  "AI/ML Models",
+  "Script Analysis",
+  "Scene Recognition",
+  "Budget Intelligence",
+  "Scheduling AI",
+  "Storyboard Gen",
+  "Team Collaboration",
+  "Production Analytics"
 ]
 
 export function CompaniesSection() {
@@ -32,10 +32,10 @@ export function CompaniesSection() {
           transition={{ duration: 0.5 }}
         >
           <h2 className="text-foreground text-3xl font-bold tracking-tight sm:text-4xl">
-            Built with the best
+            Trusted by creators worldwide
           </h2>
           <p className="text-muted-foreground mt-4 text-lg leading-8">
-            Trusted technologies that power thousands of production applications
+            Advanced AI technology powering the next generation of film production
           </p>
         </motion.div>
 

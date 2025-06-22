@@ -1,4 +1,4 @@
-import { Github, Instagram, Music2, Youtube } from "lucide-react"
+import { Github, Instagram, Music2, Youtube, Film } from "lucide-react"
 import Link from "next/link"
 
 const XLogo = ({ className }: { className?: string }) => (
@@ -15,37 +15,37 @@ const XLogo = ({ className }: { className?: string }) => (
 export function Footer() {
   const footerNavigation = {
     product: [
-      { name: "Features", href: "#features" },
-      { name: "Pricing", href: "#pricing" },
-      { name: "Testimonials", href: "#testimonials" },
-      { name: "Integration", href: "#" }
+      { name: "Features", href: "/features" },
+      { name: "Pricing", href: "/pricing" },
+      { name: "AI Script Analysis", href: "/features#script-analysis" },
+      { name: "Storyboard Generator", href: "/features#storyboards" }
     ],
     company: [
-      { name: "About", href: "#about" },
-      { name: "Blog", href: "#" },
-      { name: "Careers", href: "#" },
-      { name: "Press", href: "#" }
+      { name: "About", href: "/about" },
+      { name: "Contact", href: "/contact" },
+      { name: "Careers", href: "/contact" },
+      { name: "Press Kit", href: "/contact" }
     ],
     resources: [
-      { name: "Documentation", href: "#" },
-      { name: "Guides", href: "#" },
-      { name: "Help Center", href: "#" },
-      { name: "Community", href: "#" }
+      { name: "Documentation", href: "/features" },
+      { name: "Film Production Guide", href: "/features" },
+      { name: "Help Center", href: "/contact" },
+      { name: "Community", href: "/contact" }
     ],
     legal: [
-      { name: "Privacy", href: "#" },
-      { name: "Terms", href: "#" },
-      { name: "Cookie Policy", href: "#" },
-      { name: "License", href: "#" }
+      { name: "Privacy Policy", href: "/privacy" },
+      { name: "Terms of Service", href: "/terms" },
+      { name: "Cookie Policy", href: "/privacy" },
+      { name: "License Agreement", href: "/terms" }
     ]
   }
 
   const socialLinks = [
-    { name: "X", href: "https://x.com", icon: XLogo },
-    { name: "YouTube", href: "https://youtube.com", icon: Youtube },
-    { name: "Instagram", href: "https://instagram.com", icon: Instagram },
-    { name: "TikTok", href: "https://tiktok.com", icon: Music2 },
-    { name: "GitHub", href: "https://github.com", icon: Github }
+    { name: "X", href: "https://x.com/thinkai", icon: XLogo },
+    { name: "YouTube", href: "https://youtube.com/thinkai", icon: Youtube },
+    { name: "Instagram", href: "https://instagram.com/thinkai", icon: Instagram },
+    { name: "TikTok", href: "https://tiktok.com/thinkai", icon: Music2 },
+    { name: "GitHub", href: "https://github.com/thinkai", icon: Github }
   ]
 
   return (
@@ -56,18 +56,22 @@ export function Footer() {
       <div className="mx-auto max-w-7xl px-6 pt-16 pb-8">
         <div className="xl:grid xl:grid-cols-3 xl:gap-8">
           <div className="space-y-8">
-            <Link href="/" className="text-xl font-bold">
-              Company
+            <Link href="/" className="flex items-center gap-2">
+              <Film className="h-8 w-8 text-brand-primary" />
+              <span className="text-xl font-bold bg-gradient-to-r from-brand-primary to-brand-secondary bg-clip-text text-transparent">
+                Think AI
+              </span>
             </Link>
             <p className="text-muted-foreground text-sm leading-6">
-              Your company description here.
+              Revolutionizing film pre-production with AI-powered automation. 
+              From script to screen, streamline your creative workflow.
             </p>
             <div className="flex space-x-6">
               {socialLinks.map(item => (
                 <Link
                   key={item.name}
                   href={item.href}
-                  className="text-muted-foreground hover:text-foreground"
+                  className="text-muted-foreground hover:text-brand-primary transition-colors"
                 >
                   <span className="sr-only">{item.name}</span>
                   <item.icon className="h-5 w-5" />
@@ -86,7 +90,7 @@ export function Footer() {
                     <li key={item.name}>
                       <Link
                         href={item.href}
-                        className="text-muted-foreground hover:text-foreground text-sm leading-6"
+                        className="text-muted-foreground hover:text-brand-primary text-sm leading-6 transition-colors"
                       >
                         {item.name}
                       </Link>
@@ -103,7 +107,7 @@ export function Footer() {
                     <li key={item.name}>
                       <Link
                         href={item.href}
-                        className="text-muted-foreground hover:text-foreground text-sm leading-6"
+                        className="text-muted-foreground hover:text-brand-primary text-sm leading-6 transition-colors"
                       >
                         {item.name}
                       </Link>
@@ -122,7 +126,7 @@ export function Footer() {
                     <li key={item.name}>
                       <Link
                         href={item.href}
-                        className="text-muted-foreground hover:text-foreground text-sm leading-6"
+                        className="text-muted-foreground hover:text-brand-primary text-sm leading-6 transition-colors"
                       >
                         {item.name}
                       </Link>
@@ -139,7 +143,7 @@ export function Footer() {
                     <li key={item.name}>
                       <Link
                         href={item.href}
-                        className="text-muted-foreground hover:text-foreground text-sm leading-6"
+                        className="text-muted-foreground hover:text-brand-primary text-sm leading-6 transition-colors"
                       >
                         {item.name}
                       </Link>
@@ -152,7 +156,7 @@ export function Footer() {
         </div>
         <div className="border-border mt-16 border-t pt-8 sm:mt-20 lg:mt-24">
           <p className="text-muted-foreground text-xs leading-5">
-            &copy; {new Date().getFullYear()} Company, Inc. All rights reserved.
+            &copy; {new Date().getFullYear()} Think AI. All rights reserved. Revolutionizing film pre-production.
           </p>
         </div>
       </div>

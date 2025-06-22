@@ -3,42 +3,44 @@
 import { PricingButton } from "@/components/payments/pricing-button"
 import { Button } from "@/components/ui/button"
 import { motion } from "framer-motion"
-import { Check, CreditCard, Zap } from "lucide-react"
+import { Check, Film, Crown } from "lucide-react"
 import { SectionWrapper } from "./section-wrapper"
 
 const pricing = [
   {
-    name: "Pro Monthly",
-    price: "$19",
+    name: "Indie Filmmaker",
+    price: "$29",
     period: "/month",
-    description: "Perfect for growing businesses",
+    description: "Perfect for independent filmmakers and small productions",
     features: [
-      "Unlimited projects",
-      "Advanced analytics",
-      "Priority support",
-      "Custom integrations",
-      "API access",
-      "Export data"
+      "Up to 5 projects",
+      "AI script breakdown",
+      "Basic scheduling",
+      "Budget estimation",
+      "Storyboard generation (50/month)",
+      "Email support"
     ],
     paymentLink: process.env.NEXT_PUBLIC_STRIPE_PAYMENT_LINK_MONTHLY,
-    icon: CreditCard,
+    icon: Film,
     highlight: false
   },
   {
-    name: "Pro Yearly",
-    price: "$190",
-    period: "/year",
-    description: "Best value - save $38 per year",
+    name: "Studio Pro",
+    price: "$99",
+    period: "/month",
+    description: "Best for studios and production companies",
     features: [
-      "Everything in monthly",
-      "2 months free",
-      "Early access to features",
-      "Custom onboarding",
-      "Dedicated account manager",
-      "99.9% uptime SLA"
+      "Unlimited projects",
+      "Advanced AI features",
+      "Team collaboration (up to 20 users)",
+      "Priority scheduling algorithms",
+      "Unlimited storyboards",
+      "Advanced analytics & reporting",
+      "Priority support",
+      "Custom integrations"
     ],
     paymentLink: process.env.NEXT_PUBLIC_STRIPE_PAYMENT_LINK_YEARLY,
-    icon: Zap,
+    icon: Crown,
     highlight: true
   }
 ]
@@ -55,7 +57,7 @@ export function PricingSection() {
             viewport={{ once: true }}
             transition={{ duration: 0.5 }}
           >
-            Simple, transparent pricing
+            Choose your production plan
           </motion.h2>
           <motion.p
             className="text-muted-foreground mt-4 text-lg leading-8"
@@ -64,7 +66,7 @@ export function PricingSection() {
             viewport={{ once: true }}
             transition={{ duration: 0.5, delay: 0.1 }}
           >
-            Choose the plan that fits your needs. Cancel anytime.
+            Scale from indie projects to studio productions. Start with our free trial.
           </motion.p>
         </div>
 
@@ -94,7 +96,7 @@ export function PricingSection() {
                   transition={{ duration: 0.4, delay: 0.3 }}
                 >
                   <span className="bg-primary text-primary-foreground inline-flex items-center rounded-full px-4 py-1 text-xs font-semibold">
-                    BEST VALUE
+                    MOST POPULAR
                   </span>
                 </motion.div>
               )}
@@ -179,7 +181,7 @@ export function PricingSection() {
                   }`}
                   variant={tier.highlight ? "default" : "outline"}
                 >
-                  Get started
+                  Start Free Trial
                 </PricingButton>
               ) : (
                 <Button
@@ -191,7 +193,7 @@ export function PricingSection() {
                   variant={tier.highlight ? "default" : "outline"}
                   disabled
                 >
-                  Configure payment link
+                  Start Free Trial
                 </Button>
               )}
             </motion.div>
@@ -199,14 +201,14 @@ export function PricingSection() {
         </div>
 
         <motion.div
-          className="mt-10 text-center"
+          className="mt-8 text-center"
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.5, delay: 0.3 }}
+          transition={{ duration: 0.5, delay: 0.4 }}
         >
           <p className="text-muted-foreground text-sm">
-            All plans include a 30-day money-back guarantee. No questions asked.
+            All plans include 14-day free trial. No credit card required to start.
           </p>
         </motion.div>
       </div>

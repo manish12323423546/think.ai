@@ -2,51 +2,51 @@
 
 import { motion } from "framer-motion"
 import {
-  BarChart,
-  Code2,
-  CreditCard,
-  Database,
-  Palette,
-  Shield
+  FileText,
+  Calendar,
+  DollarSign,
+  ImageIcon,
+  Users,
+  BarChart3
 } from "lucide-react"
 import { SectionWrapper } from "./section-wrapper"
 
 const features = [
   {
-    name: "Authentication Ready",
+    name: "AI Script Breakdown",
     description:
-      "Clerk authentication pre-configured with protected routes, user management, and session handling.",
-    icon: Shield
+      "Automated script analysis extracting scenes, characters, props, locations, and technical requirements with intelligent metadata generation.",
+    icon: FileText
   },
   {
-    name: "Payments Integration",
+    name: "Smart Scheduling",
     description:
-      "Stripe integration with webhook support, subscription management, and checkout flows.",
-    icon: CreditCard
+      "AI-powered scene scheduling that optimizes shoot sequences based on locations, cast availability, and production constraints.",
+    icon: Calendar
   },
   {
-    name: "Database Setup",
+    name: "Budget Automation",
     description:
-      "PostgreSQL with Drizzle ORM configured and ready. Includes migrations and type-safe queries.",
-    icon: Database
+      "Intelligent budget estimation with category-wise breakdowns, cost optimization suggestions, and contingency planning.",
+    icon: DollarSign
   },
   {
-    name: "Modern UI Components",
+    name: "AI Storyboards",
     description:
-      "Beautiful, accessible components with shadcn/ui. Dark mode support and Tailwind CSS v4.",
-    icon: Palette
+      "Generate professional storyboard sketches from scene descriptions using advanced text-to-image AI models.",
+    icon: ImageIcon
   },
   {
-    name: "TypeScript First",
+    name: "Team Collaboration",
     description:
-      "Full TypeScript support with strict mode, path aliases, and type safety throughout.",
-    icon: Code2
+      "Role-based access for directors, producers, writers, and crew members with real-time project collaboration.",
+    icon: Users
   },
   {
-    name: "Analytics Built-in",
+    name: "Production Analytics",
     description:
-      "PostHog analytics integration for tracking user behavior and product metrics.",
-    icon: BarChart
+      "Comprehensive project insights, timeline tracking, budget analysis, and production readiness reports.",
+    icon: BarChart3
   }
 ]
 
@@ -65,7 +65,7 @@ export function FeaturesSection() {
             viewport={{ once: true }}
             transition={{ duration: 0.5 }}
           >
-            Everything Included
+            Complete Pre-Production Suite
           </motion.h2>
           <motion.p
             className="text-foreground mt-2 text-3xl font-bold tracking-tight sm:text-4xl"
@@ -74,7 +74,7 @@ export function FeaturesSection() {
             viewport={{ once: true }}
             transition={{ duration: 0.5, delay: 0.1 }}
           >
-            Start with a complete foundation
+            Everything you need from script to shoot
           </motion.p>
           <motion.p
             className="text-muted-foreground mt-6 text-lg leading-8"
@@ -83,8 +83,8 @@ export function FeaturesSection() {
             viewport={{ once: true }}
             transition={{ duration: 0.5, delay: 0.2 }}
           >
-            No more setup headaches. Clone the repo and start building your
-            product immediately.
+            Streamline your film pre-production workflow with AI-powered tools 
+            designed for modern filmmakers, studios, and creative professionals.
           </motion.p>
         </div>
 

@@ -12,34 +12,34 @@ import { SectionWrapper } from "./section-wrapper"
 
 const faqs = [
   {
-    question: "What's included in the template?",
+    question: "What file formats does Think AI support for script upload?",
     answer:
-      "Everything you need to build a production app: Next.js 15 with App Router, TypeScript, Tailwind CSS v4, shadcn/ui components, Clerk authentication, Stripe payments, PostgreSQL with Drizzle ORM, and PostHog analytics. All pre-configured and ready to use."
+      "Think AI accepts multiple script formats including .txt, .pdf, .docx, and .fdx (Final Draft). You can also paste your script directly into our editor. The AI automatically parses and analyzes your script regardless of format."
   },
   {
-    question: "How do I get started?",
+    question: "How accurate is the AI script breakdown?",
     answer:
-      "Simply clone the repository from GitHub, copy the .env.example to .env.local, add your API keys, run npm install, and you're ready to go. The whole process takes less than 5 minutes."
+      "Our AI achieves 90%+ accuracy in identifying scenes, characters, props, and locations. The system learns from industry-standard breakdowns and continuously improves. You can always review and edit the AI suggestions to ensure perfect accuracy for your production."
   },
   {
-    question: "Is this really free?",
+    question: "Can I collaborate with my team on Think AI?",
     answer:
-      "Yes! This template is 100% free and open source under the MIT license. You can use it for personal projects, commercial applications, or anything else. No hidden costs or premium features."
+      "Absolutely! Think AI supports role-based collaboration with specific access levels for Directors, Producers, Writers, and Crew Members. Team members can work simultaneously on different aspects of pre-production with real-time updates."
   },
   {
-    question: "Can I customize everything?",
+    question: "How does the AI scheduling work?",
     answer:
-      "Absolutely! You have full access to all the source code. Modify the components, change the styling, add or remove features - it's your codebase now. The template is designed to be a starting point that you can build upon."
+      "The scheduling AI considers multiple factors including location availability, cast schedules, equipment needs, and setup requirements. It optimizes shoot sequences to minimize travel time, reduce costs, and maximize efficiency while respecting your constraints."
   },
   {
-    question: "What about deployment?",
+    question: "What about data security and script confidentiality?",
     answer:
-      "The template works with any hosting provider that supports Next.js. Deploy to Vercel, Netlify, Railway, or any other platform. Database can be hosted on Supabase, Neon, or any PostgreSQL provider."
+      "We take security seriously. All scripts and project data are encrypted in transit and at rest. We use enterprise-grade security measures and never share your content with third parties. Your intellectual property remains completely confidential."
   },
   {
-    question: "How do I get help if I'm stuck?",
+    question: "Can I export my production data?",
     answer:
-      "Open an issue on GitHub for bugs or feature requests. For general questions, the community is active in discussions. If you need dedicated support, consider becoming a sponsor or reaching out for custom development."
+      "Yes! Think AI provides comprehensive export options including PDF reports for budgets, schedules, and call sheets. Storyboards can be exported as image bundles or PDFs. All data remains accessible even if you cancel your subscription."
   }
 ]
 
@@ -74,8 +74,8 @@ export function FAQSection() {
             viewport={{ once: true }}
             transition={{ duration: 0.5, delay: 0.1 }}
           >
-            Everything you need to know about the template. Can't find what
-            you're looking for? Open an issue on GitHub.
+            Everything you need to know about Think AI's film pre-production platform. 
+            Need more help? Contact our support team.
           </motion.p>
           <dl className="mt-10 space-y-6">
             {faqs.map((faq, index) => (

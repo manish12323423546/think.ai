@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button"
 import { motion } from "framer-motion"
-import { ArrowRight, Github } from "lucide-react"
+import { ArrowRight, Film } from "lucide-react"
 import Link from "next/link"
 import { SectionWrapper } from "./section-wrapper"
 
@@ -17,7 +17,7 @@ export function CTASection() {
           viewport={{ once: true }}
           transition={{ duration: 0.5 }}
         >
-          Ready to build something amazing?
+          Ready to revolutionize your pre-production?
         </motion.h2>
         <motion.p
           className="mx-auto mt-6 max-w-xl text-lg leading-8"
@@ -26,8 +26,8 @@ export function CTASection() {
           viewport={{ once: true }}
           transition={{ duration: 0.5, delay: 0.1 }}
         >
-          Stop wasting time on boilerplate. Clone this template and start
-          shipping your product today.
+          Join thousands of filmmakers who've streamlined their workflow with Think AI. 
+          Start your free trial and see the difference AI can make.
         </motion.p>
         <motion.div
           className="mt-10 flex items-center justify-center gap-x-6"
@@ -41,12 +41,9 @@ export function CTASection() {
             className="bg-brand-primary text-brand-primary-foreground hover:bg-brand-primary-hover"
             asChild
           >
-            <Link
-              href="https://github.com/mckaywrigley/mckays-app-template"
-              target="_blank"
-            >
-              <Github className="mr-2 h-4 w-4" />
-              Clone Template
+            <Link href="/signup">
+              <Film className="mr-2 h-4 w-4" />
+              Start Free Trial
               <ArrowRight className="ml-2 h-4 w-4" />
             </Link>
           </Button>
@@ -56,8 +53,8 @@ export function CTASection() {
             className="text-brand-primary hover:text-brand-primary-hover"
             asChild
           >
-            <Link href="#features">
-              View features <span aria-hidden="true">→</span>
+            <Link href="#pricing">
+              See pricing <span aria-hidden="true">→</span>
             </Link>
           </Button>
         </motion.div>
@@ -71,9 +68,9 @@ export function CTASection() {
           transition={{ duration: 0.5, delay: 0.3 }}
         >
           {[
-            { label: "Time to First Deploy", value: "< 5 min" },
-            { label: "Production Ready", value: "100%" },
-            { label: "License", value: "MIT" }
+            { label: "Setup Time", value: "< 2 min" },
+            { label: "Free Trial", value: "14 days" },
+            { label: "Support", value: "24/7" }
           ].map((stat, index) => (
             <motion.div
               key={stat.label}

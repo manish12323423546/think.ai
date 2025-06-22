@@ -1,13 +1,27 @@
-import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server"
-import { NextResponse } from "next/server"
+import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server'
+import { NextResponse } from 'next/server'
 
-const isProtectedRoute = createRouteMatcher(["/dashboard(.*)"])
+const isProtectedRoute = createRouteMatcher([
+  '/dashboard(.*)',
+])
+
+const isRoleSelectionRoute = createRouteMatcher([
+  '/role-selection',
+])
 
 export default clerkMiddleware(async (auth, req) => {
-  const { userId, redirectToSignIn } = await auth()
+  // Allow access to role selection
+  if (isRoleSelectionRoute(req)) {
+    return NextResponse.next()
+  }
 
-  if (!userId && isProtectedRoute(req)) {
-    return redirectToSignIn()
+  // Protect dashboard routes
+  if (isProtectedRoute(req)) {
+    const { userId } = await auth()
+    
+    if (!userId) {
+      return NextResponse.redirect(new URL('/login', req.url))
+    }
   }
 
   return NextResponse.next()

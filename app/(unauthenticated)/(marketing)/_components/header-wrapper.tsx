@@ -1,16 +1,32 @@
-import { getCustomerByUserId } from "@/actions/customers"
+"use client"
+
+import { useUser } from "@clerk/nextjs"
+import { useEffect, useState } from "react"
 import { SelectCustomer } from "@/db/schema/customers"
-import { currentUser } from "@clerk/nextjs/server"
+import { getCustomerByUserId } from "@/actions/customers"
 import { Header } from "./header"
 
-export async function HeaderWrapper() {
-  const user = await currentUser()
-  let membership: SelectCustomer["membership"] | null = null
+export function HeaderWrapper() {
+  const { user, isLoaded } = useUser()
+  const [membership, setMembership] = useState<SelectCustomer["membership"] | null>(null)
 
-  if (user) {
-    const customer = await getCustomerByUserId(user.id)
-    membership = customer?.membership ?? "free"
-  }
+  useEffect(() => {
+    async function fetchMembership() {
+      if (isLoaded && user) {
+        try {
+          const customer = await getCustomerByUserId(user.id)
+          setMembership(customer?.membership ?? "free")
+        } catch (error) {
+          console.error("Error fetching customer data:", error)
+          setMembership("free")
+        }
+      } else if (isLoaded && !user) {
+        setMembership(null)
+      }
+    }
+
+    fetchMembership()
+  }, [user, isLoaded])
 
   return <Header userMembership={membership} />
 }

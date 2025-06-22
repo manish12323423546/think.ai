@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button"
 import { motion } from "framer-motion"
-import { ArrowRight, Star } from "lucide-react"
+import { ArrowRight, Play, Film } from "lucide-react"
 import Link from "next/link"
 import { useState } from "react"
 import { SectionWrapper } from "./section-wrapper"
@@ -20,15 +20,11 @@ export function HeroSection() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
         >
-          <Link
-            href="https://github.com/mckaywrigley/mckays-app-template"
-            className="group ring-border hover:bg-accent hover:text-accent-foreground relative inline-flex items-center rounded-full px-3 py-1 text-xs leading-6 shadow-sm ring-1 transition-colors sm:text-sm"
-            target="_blank"
-          >
-            <span className="mr-2 inline-block">⭐️</span>
-            <span className="inline">100% Free & Open Source</span>
+          <div className="group ring-border hover:bg-accent hover:text-accent-foreground relative inline-flex items-center rounded-full px-3 py-1 text-xs leading-6 shadow-sm ring-1 transition-colors sm:text-sm">
+            <span className="mr-2 inline-block">🎬</span>
+            <span className="inline">AI-Powered Film Pre-Production</span>
             <ArrowRight className="ml-2 h-4 w-4" />
-          </Link>
+          </div>
         </motion.div>
 
         <motion.h1
@@ -37,7 +33,7 @@ export function HeroSection() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.1 }}
         >
-          The #1 Full Stack
+          From Script to
           <motion.span
             className="from-brand-primary to-brand-secondary block bg-gradient-to-r bg-clip-text pb-2 leading-tight text-transparent"
             animate={{
@@ -52,7 +48,7 @@ export function HeroSection() {
               backgroundSize: "200% 200%"
             }}
           >
-            App Template
+            Production Plan
           </motion.span>
         </motion.h1>
         <motion.p
@@ -61,8 +57,9 @@ export function HeroSection() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.2 }}
         >
-          Everything you need to launch your next big idea with authentication,
-          payments, database, and more - start building today.
+          Automate your film pre-production with AI-powered script breakdown, 
+          intelligent scheduling, budget estimation, and storyboard generation. 
+          Perfect for filmmakers, studios, and content creators.
         </motion.p>
         <motion.div
           className="mt-8 flex flex-col items-center justify-center gap-4 sm:flex-row sm:gap-x-6"
@@ -80,14 +77,14 @@ export function HeroSection() {
               asChild
               className="group relative w-full overflow-hidden sm:w-auto"
             >
-              <Link href="https://github.com/mckaywrigley/mckays-app-template">
+              <Link href="/signup">
                 <motion.span
                   className="absolute inset-0 -skew-x-12 bg-gradient-to-r from-transparent via-white/20 to-transparent"
                   initial={{ x: "-200%" }}
                   whileHover={{ x: "200%" }}
                   transition={{ duration: 0.6 }}
                 />
-                Start Building
+                Start Your Project
                 <motion.div
                   className="ml-2 inline-block"
                   initial={{ x: 0 }}
@@ -112,17 +109,16 @@ export function HeroSection() {
               onMouseEnter={() => setStarHovered(true)}
               onMouseLeave={() => setStarHovered(false)}
             >
-              <Link href="https://github.com/mckaywrigley/mckays-app-template">
-                Star On GitHub
+              <Link href="#video">
+                Watch Demo
                 <motion.div
                   className="ml-2 inline-block"
-                  whileHover={{ rotate: 12 }}
+                  whileHover={{ scale: 1.1 }}
                   transition={{ type: "spring", stiffness: 400, damping: 17 }}
                 >
-                  <Star
+                  <Play
                     className={`h-4 w-4 transition-colors ${starHovered ? "text-brand-accent" : ""}`}
                     fill="currentColor"
-                    stroke="currentColor"
                   />
                 </motion.div>
               </Link>
@@ -137,7 +133,7 @@ export function HeroSection() {
           animate={{ opacity: 1 }}
           transition={{ duration: 0.6, delay: 0.6 }}
         >
-          {["Modern Tech Stack", "Production-Ready", "Continuous Updates"].map(
+          {["AI-Powered Automation", "Collaborative Workflows", "Industry-Ready Tools"].map(
             (text, i) => (
               <motion.div
                 key={text}

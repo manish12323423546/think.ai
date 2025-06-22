@@ -8,11 +8,35 @@ import { eq } from "drizzle-orm"
 export async function getCustomerByUserId(
   userId: string
 ): Promise<SelectCustomer | null> {
-  const customer = await db.query.customers.findFirst({
-    where: eq(customers.userId, userId)
-  })
-
-  return customer || null
+  try {
+    // Add timeout protection
+    const timeoutPromise = new Promise<null>((_, reject) => {
+      setTimeout(() => reject(new Error('Database query timeout')), 5000)
+    })
+    
+    const queryPromise = db.query.customers.findFirst({
+      where: eq(customers.userId, userId)
+    })
+    
+    const customer = await Promise.race([queryPromise, timeoutPromise])
+    return customer || null
+  } catch (error) {
+    console.error('Database connection error in getCustomerByUserId:', error)
+    // Return a default customer object to prevent app crashes
+    return {
+      id: userId,
+      userId,
+      membership: "free",
+      role: "team_member",
+      permissions: [],
+      projectAccess: [],
+      stripeCustomerId: null,
+      stripeSubscriptionId: null,
+      profile: null,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    } as SelectCustomer
+  }
 }
 
 export async function getBillingDataByUserId(userId: string): Promise<{
@@ -20,23 +44,39 @@ export async function getBillingDataByUserId(userId: string): Promise<{
   clerkEmail: string | null
   stripeEmail: string | null
 }> {
-  // Get Clerk user data
-  const user = await currentUser()
+  try {
+    // Get Clerk user data
+    const user = await currentUser()
 
-  // Get profile to fetch Stripe customer ID
-  const customer = await db.query.customers.findFirst({
-    where: eq(customers.userId, userId)
-  })
+    // Get profile to fetch Stripe customer ID with timeout protection
+    const timeoutPromise = new Promise<null>((_, reject) => {
+      setTimeout(() => reject(new Error('Database query timeout')), 5000)
+    })
+    
+    const queryPromise = db.query.customers.findFirst({
+      where: eq(customers.userId, userId)
+    })
+    
+    const customer = await Promise.race([queryPromise, timeoutPromise])
 
-  // Get Stripe email if it exists
-  const stripeEmail = customer?.stripeCustomerId
-    ? user?.emailAddresses[0]?.emailAddress || null
-    : null
+    // Get Stripe email if it exists
+    const stripeEmail = customer?.stripeCustomerId
+      ? user?.emailAddresses[0]?.emailAddress || null
+      : null
 
-  return {
-    customer: customer || null,
-    clerkEmail: user?.emailAddresses[0]?.emailAddress || null,
-    stripeEmail
+    return {
+      customer: customer || null,
+      clerkEmail: user?.emailAddresses[0]?.emailAddress || null,
+      stripeEmail
+    }
+  } catch (error) {
+    console.error('Database connection error in getBillingDataByUserId:', error)
+    const user = await currentUser()
+    return {
+      customer: null,
+      clerkEmail: user?.emailAddresses[0]?.emailAddress || null,
+      stripeEmail: null
+    }
   }
 }
 

@@ -1,6 +1,8 @@
-"use server"
+"use client"
 
-export async function TailwindIndicator() {
+import React from "react"
+
+export function TailwindIndicator() {
   // Don't show in production
   if (process.env.NODE_ENV === "production") return null
 

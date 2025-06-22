@@ -3,7 +3,7 @@
 import { Button } from "@/components/ui/button"
 import { SelectCustomer } from "@/db/schema/customers"
 import { SignedIn, SignedOut, UserButton } from "@clerk/nextjs"
-import { Menu, Moon, Sun, X, Sparkles } from "lucide-react"
+import { Menu, Moon, Sun, X, Film } from "lucide-react"
 import { useTheme } from "next-themes"
 import Link from "next/link"
 import { useEffect, useState } from "react"
@@ -36,8 +36,11 @@ export function Header({ userMembership }: HeaderProps) {
           aria-label="Global"
         >
           <div className="flex lg:flex-1">
-            <Link href="/" className="-m-1.5 p-1.5">
-              <span className="text-xl font-bold">Mckay's App Template</span>
+            <Link href="/" className="-m-1.5 p-1.5 flex items-center gap-2">
+              <Film className="h-8 w-8 text-brand-primary" />
+              <span className="text-xl font-bold bg-gradient-to-r from-brand-primary to-brand-secondary bg-clip-text text-transparent">
+                Think AI
+              </span>
             </Link>
           </div>
           <div className="flex lg:hidden">
@@ -59,7 +62,7 @@ export function Header({ userMembership }: HeaderProps) {
               <Link
                 key={item.name}
                 href={item.href}
-                className="text-foreground hover:text-muted-foreground text-sm leading-6 font-semibold"
+                className="text-foreground hover:text-brand-primary text-sm leading-6 font-semibold transition-colors"
               >
                 {item.name}
               </Link>
@@ -83,22 +86,13 @@ export function Header({ userMembership }: HeaderProps) {
                 <Link href="/login">Log in</Link>
               </Button>
               <Button asChild>
-                <Link href="/signup">Sign up</Link>
+                <Link href="/signup">Start Free Trial</Link>
               </Button>
             </SignedOut>
             <SignedIn>
-              {userMembership === "pro" ? (
-                <Button asChild>
-                  <Link href="/dashboard">Dashboard</Link>
-                </Button>
-              ) : (
-                <Button asChild className="gap-2">
-                  <Link href="/#pricing">
-                    <Sparkles className="h-4 w-4" />
-                    Upgrade
-                  </Link>
-                </Button>
-              )}
+              <Button asChild>
+                <Link href="/dashboard">Dashboard</Link>
+              </Button>
               <UserButton />
             </SignedIn>
           </div>
@@ -119,10 +113,13 @@ export function Header({ userMembership }: HeaderProps) {
             <div className="flex items-center justify-between">
               <Link
                 href="/"
-                className="-m-1.5 p-1.5"
+                className="-m-1.5 p-1.5 flex items-center gap-2"
                 onClick={() => setMobileMenuOpen(false)}
               >
-                <span className="text-xl font-bold">Takeoff</span>
+                <Film className="h-6 w-6 text-brand-primary" />
+                <span className="text-lg font-bold bg-gradient-to-r from-brand-primary to-brand-secondary bg-clip-text text-transparent">
+                  Think AI
+                </span>
               </Link>
               <button
                 type="button"
@@ -177,32 +174,20 @@ export function Header({ userMembership }: HeaderProps) {
                         href="/signup"
                         onClick={() => setMobileMenuOpen(false)}
                       >
-                        Sign up
+                        Start Free Trial
                       </Link>
                     </Button>
                   </SignedOut>
                   <SignedIn>
-                    {userMembership === "pro" ? (
-                      <Button className="w-full" asChild>
-                        <Link
-                          href="/dashboard"
-                          onClick={() => setMobileMenuOpen(false)}
-                        >
-                          Dashboard
-                        </Link>
-                      </Button>
-                    ) : (
-                      <Button className="w-full gap-2" asChild>
-                        <Link
-                          href="/#pricing"
-                          onClick={() => setMobileMenuOpen(false)}
-                        >
-                          <Sparkles className="h-4 w-4" />
-                          Upgrade
-                        </Link>
-                      </Button>
-                    )}
-                    <div className="flex justify-center pt-4">
+                    <Button className="w-full" asChild>
+                      <Link
+                        href="/dashboard"
+                        onClick={() => setMobileMenuOpen(false)}
+                      >
+                        Dashboard
+                      </Link>
+                    </Button>
+                    <div className="flex justify-center pt-2">
                       <UserButton />
                     </div>
                   </SignedIn>

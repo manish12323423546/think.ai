@@ -1,8 +1,8 @@
 "use client"
 
-import { Link, Settings2, User, Users } from "lucide-react"
-import * as React from "react"
-
+import { NavMain } from "@/app/(authenticated)/dashboard/_components/nav-main"
+import { NavUser } from "@/app/(authenticated)/dashboard/_components/nav-user"
+import { TeamSwitcher } from "@/app/(authenticated)/dashboard/_components/team-switcher"
 import {
   Sidebar,
   SidebarContent,
@@ -10,95 +10,164 @@ import {
   SidebarHeader,
   SidebarRail
 } from "@/components/ui/sidebar"
-import { NavMain } from "../_components/nav-main"
-import { NavUser } from "../_components/nav-user"
-import { TeamSwitcher } from "../_components/team-switcher"
+import { Roles } from "@/types/globals"
+import { 
+  Film, 
+  Edit3, 
+  Palette, 
+  BarChart3, 
+  Settings, 
+  Users, 
+  FolderOpen,
+  Crown,
+  PlusCircle,
+  FileText,
+  Layers
+} from "lucide-react"
 
-export function AppSidebar({
+// Define navigation items based on roles
+const getNavigationItems = (role: Roles, permissions: string[]) => {
+  const items = []
+
+  // Dashboard - available to all
+  items.push({
+    title: "Dashboard",
+    url: "/dashboard",
+    icon: BarChart3,
+    isActive: false
+  })
+
+  // Projects - available to most roles
+  if (permissions.includes('projects:view')) {
+    items.push({
+      title: "Projects",
+      url: "/dashboard/projects",
+      icon: FolderOpen,
+      items: [
+        ...(permissions.includes('projects:create') ? [{
+          title: "Create Project",
+          url: "/dashboard/projects/create",
+          icon: PlusCircle
+        }] : []),
+        {
+          title: "My Projects",
+          url: "/dashboard/projects",
+          icon: FileText
+        }
+      ]
+    })
+  }
+
+  // Scripts - for writers, directors, admins
+  if (permissions.includes('scripts:view')) {
+    items.push({
+      title: "Scripts",
+      url: "/dashboard/scripts",
+      icon: Edit3,
+      items: [
+        ...(permissions.includes('scripts:create') ? [{
+          title: "New Script",
+          url: "/dashboard/scripts/create",
+          icon: PlusCircle
+        }] : []),
+        {
+          title: "My Scripts",
+          url: "/dashboard/scripts",
+          icon: FileText
+        }
+      ]
+    })
+  }
+
+  // Storyboards - for storyboard artists, directors, producers, admins
+  if (permissions.includes('storyboards:view')) {
+    items.push({
+      title: "Storyboards",
+      url: "/dashboard/storyboards",
+      icon: Palette,
+      items: [
+        ...(permissions.includes('storyboards:create') ? [{
+          title: "New Storyboard",
+          url: "/dashboard/storyboards/create",
+          icon: PlusCircle
+        }] : []),
+        {
+          title: "My Storyboards",
+          url: "/dashboard/storyboards",
+          icon: Layers
+        }
+      ]
+    })
+  }
+
+  // Analytics - for producers, directors, admins
+  if (permissions.includes('analytics:view')) {
+    items.push({
+      title: "Analytics",
+      url: "/dashboard/analytics",
+      icon: BarChart3
+    })
+  }
+
+  // User Management - admin only
+  if (permissions.includes('users:manage')) {
+    items.push({
+      title: "User Management",
+      url: "/dashboard/admin/users",
+      icon: Users,
+      items: [
+        {
+          title: "All Users",
+          url: "/dashboard/admin/users",
+          icon: Users
+        },
+        {
+          title: "Roles & Permissions",
+          url: "/dashboard/admin/roles",
+          icon: Crown
+        }
+      ]
+    })
+  }
+
+  // Settings - available to admins and some other roles
+  if (permissions.includes('settings:manage') || role === 'admin') {
+    items.push({
+      title: "Settings",
+      url: "/dashboard/settings",
+      icon: Settings
+    })
+  }
+
+  return items
+}
+
+export function AppSidebar({ 
   userData,
-  ...props
+  ...props 
 }: React.ComponentProps<typeof Sidebar> & {
   userData: {
     name: string
     email: string
     avatar: string
     membership: string
+    role: Roles
+    permissions: string[]
+    userId: string
   }
 }) {
-  const data = {
-    user: userData,
-    teams: [
-      {
-        name: "Personal",
-        logo: User,
-        plan: "Account"
-      },
-      {
-        name: "Team 1",
-        logo: Users,
-        plan: "Team"
-      },
-      {
-        name: "Team 2",
-        logo: Users,
-        plan: "Team"
-      },
-      {
-        name: "Team 3",
-        logo: Users,
-        plan: "Team"
-      }
-    ],
-    navMain: [
-      {
-        title: "Nav Item 1",
-        url: "#",
-        icon: Link,
-        items: [
-          {
-            title: "Sub Item 1",
-            url: "/dashboard/nav-item-1"
-          },
-          {
-            title: "Sub Item 2",
-            url: "/dashboard/nav-item-2"
-          }
-        ]
-      },
-      {
-        title: "Nav Item 2",
-        url: "#",
-        icon: Link,
-        items: [
-          {
-            title: "Sub Item 1",
-            url: "/dashboard/nav-item-1"
-          }
-        ]
-      },
-      {
-        title: "Settings",
-        url: "#",
-        icon: Settings2,
-        items: [
-          {
-            title: "General",
-            url: "/dashboard/settings"
-          }
-        ]
-      }
-    ]
-  }
+  const navigationItems = getNavigationItems(userData.role, userData.permissions)
+
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
-        <TeamSwitcher teams={data.teams} />
+        <TeamSwitcher role={userData.role} />
       </SidebarHeader>
       <SidebarContent>
-        <NavMain items={data.navMain} />
+        <NavMain items={navigationItems} />
       </SidebarContent>
       <SidebarFooter>
-        <NavUser user={data.user} />
+        <NavUser user={userData} />
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>

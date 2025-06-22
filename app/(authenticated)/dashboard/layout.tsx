@@ -2,6 +2,8 @@ import { getCustomerByUserId } from "@/actions/customers"
 import { currentUser } from "@clerk/nextjs/server"
 import { redirect } from "next/navigation"
 import DashboardClientLayout from "./_components/layout-client"
+import { getCurrentUserRole } from "@/lib/roles-server"
+import { Roles } from "@/types/globals"
 
 export default async function DashboardLayout({
   children
@@ -14,23 +16,40 @@ export default async function DashboardLayout({
     redirect("/login")
   }
 
-  const customer = await getCustomerByUserId(user.id)
+  // Get user role from Clerk metadata
+  const userRole = await getCurrentUserRole()
+  
+  // If user doesn't have a role, redirect to role selection
+  if (!userRole) {
+    redirect("/role-selection")
+  }
 
-  // Gate dashboard access for pro members only
-  // Store a message to show why they were redirected
-  if (!customer || customer.membership !== "pro") {
-    // Using searchParams to pass a message that can be read by client components
-    redirect("/?redirect=dashboard#pricing")
+  // Try to get customer data, but don't block access if database is unavailable
+  let customer = null
+  try {
+    customer = await getCustomerByUserId(user.id)
+  } catch (error) {
+    console.warn('Customer data unavailable, continuing with default access:', error)
+  }
+
+  // Allow access based on role - this is a creative studio where roles determine access
+  // Pro membership check can be added later for specific premium features if needed
+  const hasAccess = !!userRole // Anyone with a role can access the dashboard
+
+  if (!hasAccess) {
+    redirect("/role-selection")
   }
 
   const userData = {
-    name:
-      user.firstName && user.lastName
-        ? `${user.firstName} ${user.lastName}`
-        : user.firstName || user.username || "User",
+    name: user.firstName && user.lastName 
+      ? `${user.firstName} ${user.lastName}` 
+      : user.firstName || user.username || "User",
     email: user.emailAddresses[0]?.emailAddress || "",
     avatar: user.imageUrl,
-    membership: customer.membership
+    membership: customer?.membership || "free",
+    role: userRole,
+    permissions: user.unsafeMetadata?.permissions as string[] || [],
+    userId: user.id
   }
 
   return (
