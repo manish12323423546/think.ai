@@ -9,6 +9,10 @@ export async function getCustomerByUserId(
   userId: string
 ): Promise<SelectCustomer | null> {
   try {
+    const user = await currentUser().catch(() => null)
+    if (user && user.id !== userId) {
+      throw new Error('Unauthorized access to customer data')
+    }
     // Add timeout protection
     const timeoutPromise = new Promise<null>((_, reject) => {
       setTimeout(() => reject(new Error('Database query timeout')), 5000)
@@ -47,6 +51,9 @@ export async function getBillingDataByUserId(userId: string): Promise<{
   try {
     // Get Clerk user data
     const user = await currentUser()
+    if (user && user.id !== userId) {
+      throw new Error('Unauthorized access to billing data')
+    }
 
     // Get profile to fetch Stripe customer ID with timeout protection
     const timeoutPromise = new Promise<null>((_, reject) => {
@@ -84,6 +91,10 @@ export async function createCustomer(
   userId: string
 ): Promise<{ isSuccess: boolean; data?: SelectCustomer }> {
   try {
+    const user = await currentUser().catch(() => null)
+    if (user && user.id !== userId) {
+      throw new Error('Unauthorized create customer request')
+    }
     const [newCustomer] = await db
       .insert(customers)
       .values({
@@ -108,6 +119,10 @@ export async function updateCustomerByUserId(
   updates: Partial<SelectCustomer>
 ): Promise<{ isSuccess: boolean; data?: SelectCustomer }> {
   try {
+    const user = await currentUser().catch(() => null)
+    if (user && user.id !== userId) {
+      throw new Error('Unauthorized update attempt')
+    }
     const [updatedCustomer] = await db
       .update(customers)
       .set(updates)

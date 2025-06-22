@@ -1,7 +1,7 @@
 import { type InsertCustomer } from "../../schema/customers"
 
-// get this from your 1st user in clerk (dev mode)
-export const userId = "user_2y8Cx5ekKHYstsIdBVAj2ZYB6EV"
+// Clerk user ID for seeding, configure via env to avoid committing real IDs
+export const userId = process.env.SEED_USER_ID || "replace-with-user-id"
 
 export const customersData: InsertCustomer[] = [
   {
