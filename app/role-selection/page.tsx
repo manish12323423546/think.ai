@@ -107,7 +107,7 @@ export default function RoleSelectionPage() {
       }, 1000)
 
     } catch (error) {
-      console.error('Failed to update role:', error)
+      // Error logged server-side, show user-friendly message
       toast.error('Failed to update role. Please try again.')
     } finally {
       setIsUpdating(false)

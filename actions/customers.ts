@@ -4,6 +4,7 @@ import { db } from "@/db"
 import { customers, type SelectCustomer } from "@/db/schema/customers"
 import { currentUser } from "@clerk/nextjs/server"
 import { eq } from "drizzle-orm"
+import { createActionLogger } from "@/lib/logger"
 
 export async function getCustomerByUserId(
   userId: string
@@ -21,7 +22,8 @@ export async function getCustomerByUserId(
     const customer = await Promise.race([queryPromise, timeoutPromise])
     return customer || null
   } catch (error) {
-    console.error('Database connection error in getCustomerByUserId:', error)
+    const logger = createActionLogger('getCustomerByUserId', userId)
+    logger.error('Database connection error', error)
     // Return a default customer object to prevent app crashes
     return {
       id: userId,
@@ -70,7 +72,8 @@ export async function getBillingDataByUserId(userId: string): Promise<{
       stripeEmail
     }
   } catch (error) {
-    console.error('Database connection error in getBillingDataByUserId:', error)
+    const logger = createActionLogger('getBillingDataByUserId', userId)
+    logger.error('Database connection error', error)
     const user = await currentUser()
     return {
       customer: null,
@@ -98,7 +101,8 @@ export async function createCustomer(
 
     return { isSuccess: true, data: newCustomer }
   } catch (error) {
-    console.error("Error creating customer:", error)
+    const logger = createActionLogger('createCustomer', userId)
+    logger.error('Failed to create customer', error)
     return { isSuccess: false }
   }
 }
@@ -120,7 +124,8 @@ export async function updateCustomerByUserId(
 
     return { isSuccess: true, data: updatedCustomer }
   } catch (error) {
-    console.error("Error updating customer by userId:", error)
+    const logger = createActionLogger('updateCustomerByUserId', userId)
+    logger.error('Failed to update customer', error)
     return { isSuccess: false }
   }
 }
@@ -142,7 +147,8 @@ export async function updateCustomerByStripeCustomerId(
 
     return { isSuccess: true, data: updatedCustomer }
   } catch (error) {
-    console.error("Error updating customer by stripeCustomerId:", error)
+    const logger = createActionLogger('updateCustomerByStripeCustomerId')
+    logger.error('Failed to update customer by Stripe ID', error, { stripeCustomerId })
     return { isSuccess: false }
   }
 }

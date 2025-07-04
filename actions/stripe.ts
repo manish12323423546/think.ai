@@ -9,6 +9,7 @@ import {
 import { SelectCustomer } from "@/db/schema/customers"
 import { stripe } from "@/lib/stripe"
 import { auth } from "@clerk/nextjs/server"
+import { createActionLogger } from "@/lib/logger"
 import Stripe from "stripe"
 
 type MembershipStatus = SelectCustomer["membership"]
@@ -81,7 +82,8 @@ export const updateStripeCustomer = async (
 
     return result.data
   } catch (error) {
-    console.error("Error in updateStripeCustomer:", error)
+    const logger = createActionLogger('updateStripeCustomer', userId)
+    logger.error('Failed to update Stripe customer', error, { subscriptionId, customerId })
     throw error instanceof Error
       ? error
       : new Error("Failed to update Stripe customer")
@@ -129,7 +131,8 @@ export const manageSubscriptionStatusChange = async (
 
     return membershipStatus
   } catch (error) {
-    console.error("Error in manageSubscriptionStatusChange:", error)
+    const logger = createActionLogger('manageSubscriptionStatusChange')
+    logger.error('Failed to manage subscription status change', error, { subscriptionId, customerId, productId })
     throw error instanceof Error
       ? error
       : new Error("Failed to update subscription status")
@@ -156,7 +159,8 @@ export const createCheckoutUrl = async (
 
     return { url: url.toString(), error: null }
   } catch (error) {
-    console.error("Error creating checkout URL:", error)
+    const logger = createActionLogger('createCheckoutUrl', userId)
+    logger.error('Failed to create checkout URL', error, { paymentLinkUrl })
     return {
       url: null,
       error:

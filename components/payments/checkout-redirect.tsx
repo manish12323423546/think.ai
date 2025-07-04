@@ -4,6 +4,7 @@ import { createCheckoutUrl } from "@/actions/stripe"
 import { useAuth } from "@clerk/nextjs"
 import { useEffect, useState } from "react"
 import { toast } from "sonner"
+import { createComponentLogger } from "@/lib/logger"
 
 export function CheckoutRedirect() {
   const { isSignedIn } = useAuth()
@@ -35,7 +36,10 @@ export function CheckoutRedirect() {
           window.location.href = result.url
         }
       } catch (error) {
-        console.error("Checkout redirect error:", error)
+        const logger = createComponentLogger('CheckoutRedirect')
+        logger.error('Checkout redirect failed', error instanceof Error ? error : undefined, {
+          action: 'handlePendingCheckout'
+        })
         toast.error("Failed to redirect to checkout")
       }
     }

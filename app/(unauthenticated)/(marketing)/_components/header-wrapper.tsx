@@ -5,6 +5,7 @@ import { useEffect, useState } from "react"
 import { SelectCustomer } from "@/db/schema/customers"
 import { getCustomerByUserId } from "@/actions/customers"
 import { Header } from "./header"
+import { createComponentLogger } from "@/lib/logger"
 
 export function HeaderWrapper() {
   const { user, isLoaded } = useUser()
@@ -17,7 +18,10 @@ export function HeaderWrapper() {
           const customer = await getCustomerByUserId(user.id)
           setMembership(customer?.membership ?? "free")
         } catch (error) {
-          console.error("Error fetching customer data:", error)
+          const logger = createComponentLogger('HeaderWrapper', user.id)
+          logger.error('Failed to fetch customer data', error instanceof Error ? error : undefined, {
+            action: 'fetchCustomerData'
+          })
           setMembership("free")
         }
       } else if (isLoaded && !user) {

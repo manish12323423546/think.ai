@@ -4,6 +4,7 @@ import { redirect } from "next/navigation"
 import DashboardClientLayout from "./_components/layout-client"
 import { getCurrentUserRole } from "@/lib/roles-server"
 import { Roles } from "@/types/globals"
+import { logger } from "@/lib/logger"
 
 export default async function DashboardLayout({
   children
@@ -29,7 +30,10 @@ export default async function DashboardLayout({
   try {
     customer = await getCustomerByUserId(user.id)
   } catch (error) {
-    console.warn('Customer data unavailable, continuing with default access:', error)
+    logger.warn('Customer data unavailable, continuing with default access', error instanceof Error ? error : undefined, {
+      userId: user.id,
+      component: 'DashboardLayout'
+    })
   }
 
   // Allow access based on role - this is a creative studio where roles determine access

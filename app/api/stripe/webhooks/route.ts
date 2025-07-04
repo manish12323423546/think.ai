@@ -3,6 +3,7 @@ import {
   updateStripeCustomer
 } from "@/actions/stripe"
 import { stripe } from "@/lib/stripe"
+import { createRequestLogger } from "@/lib/logger"
 import { headers } from "next/headers"
 import Stripe from "stripe"
 
@@ -13,6 +14,11 @@ const relevantEvents = new Set([
 ])
 
 export async function POST(req: Request) {
+  const requestId = crypto.randomUUID()
+  const logger = createRequestLogger(req as any, requestId)
+  
+  logger.info('Processing Stripe webhook')
+  
   const body = await req.text()
   const sig = (await headers()).get("Stripe-Signature") as string
   const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET
@@ -25,9 +31,7 @@ export async function POST(req: Request) {
 
     event = stripe.webhooks.constructEvent(body, sig, webhookSecret)
   } catch (err) {
-    console.error(
-      `Webhook Error: ${err instanceof Error ? err.message : "Unknown error"}`
-    )
+    logger.error('Webhook signature verification failed', err as Error)
     return new Response(
       JSON.stringify({
         error: err instanceof Error ? err.message : "Unknown error"
@@ -55,7 +59,7 @@ export async function POST(req: Request) {
           throw new Error("Unhandled relevant event!")
       }
     } catch (error) {
-      console.error("Webhook handler failed:", error)
+      logger.error('Webhook handler failed', error as Error, { eventType: event.type })
       return new Response(
         JSON.stringify({
           error: "Webhook handler failed. View your function logs."

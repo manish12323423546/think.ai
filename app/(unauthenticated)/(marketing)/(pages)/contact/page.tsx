@@ -18,6 +18,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import Link from "next/link"
+import { createComponentLogger } from "@/lib/logger"
 import { useState } from "react"
 
 const contactOptions = [
@@ -95,7 +96,14 @@ export default function ContactPage() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     // Handle form submission here
-    console.log("Form submitted:", formData)
+    const logger = createComponentLogger('ContactPage')
+    logger.info('Contact form submitted', {
+      metadata: {
+        name: formData.name,
+        email: formData.email,
+        messageLength: formData.message.length
+      }
+    })
     setSubmitted(true)
   }
 

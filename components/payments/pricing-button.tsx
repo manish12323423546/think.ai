@@ -6,6 +6,7 @@ import { useAuth } from "@clerk/nextjs"
 import { useRouter } from "next/navigation"
 import { useState } from "react"
 import { toast } from "sonner"
+import { createComponentLogger } from "@/lib/logger"
 
 interface PricingButtonProps {
   paymentLink: string
@@ -47,7 +48,11 @@ export function PricingButton({
         throw new Error("No checkout URL received")
       }
     } catch (error) {
-      console.error("Checkout error:", error)
+      const logger = createComponentLogger('PricingButton')
+      logger.error('Checkout initiation failed', error instanceof Error ? error : undefined, {
+        action: 'handleCheckout',
+        metadata: { paymentLink }
+      })
       toast.error(
         error instanceof Error ? error.message : "Failed to start checkout"
       )

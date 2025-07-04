@@ -3,6 +3,7 @@ import { auth } from "@clerk/nextjs/server"
 import { AlertCircle, CreditCard, Film, Zap, Crown } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
+import { logger } from "@/lib/logger"
 
 export default async function BillingPage() {
   const { userId } = await auth()
@@ -21,7 +22,14 @@ export default async function BillingPage() {
   }
 
   const customerResponse = await getBillingDataByUserId(userId)
-  console.log(customerResponse)
+  logger.debug('Retrieved billing data for user', {
+    userId,
+    component: 'BillingPage',
+    metadata: {
+      hasCustomer: !!customerResponse.customer,
+      hasSubscription: !!customerResponse.subscription
+    }
+  })
 
   const customerData = customerResponse.customer
 

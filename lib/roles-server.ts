@@ -3,6 +3,7 @@ import { clerkClient } from "@clerk/nextjs/server"
 import { currentUser } from "@clerk/nextjs/server"
 import { Roles } from "@/types/globals"
 import { ROLE_PERMISSIONS, type Permission } from "./roles"
+import { createComponentLogger } from "@/lib/logger"
 
 // Server-side role checking
 export async function checkRole(role: Roles) {
@@ -31,7 +32,8 @@ export async function getCurrentUserRole(): Promise<Roles | null> {
     
     return role as Roles || null
   } catch (error) {
-    console.error('Error getting current user role:', error)
+    const logger = createComponentLogger('roles-server')
+    logger.error('Failed to get current user role', error)
     return null
   }
 }
@@ -56,7 +58,8 @@ export async function setUserRole(userId: string, role: Roles) {
     })
     return { success: true }
   } catch (error) {
-    console.error('Error setting user role:', error)
+    const logger = createComponentLogger('roles-server')
+    logger.error('Failed to set user role', error, { userId, role })
     return { success: false, error: 'Failed to set user role' }
   }
 }
