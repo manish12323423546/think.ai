@@ -11,6 +11,7 @@ import { Crown, Edit, Film, Palette, Trophy, Users, CheckCircle, ArrowRight, Loa
 import { toast } from "sonner"
 import { Roles } from "@/types/globals"
 import { ROLE_PERMISSIONS } from "@/lib/roles"
+import { updateCurrentUserRole } from "@/actions/users"
 
 const roles = [
   {
@@ -86,14 +87,11 @@ export default function RoleSelectionPage() {
 
     setIsUpdating(true)
     try {
-      // Update user metadata with role and permissions
-      await user.update({
-        unsafeMetadata: {
-          ...user.unsafeMetadata,
-          role: selectedRole,
-          permissions: ROLE_PERMISSIONS[selectedRole]
-        }
-      })
+      // Update user metadata securely on the server
+      await updateCurrentUserRole(selectedRole)
+
+      // Refresh user data
+      await user.reload()
 
       // Wait for the update to complete
       await user.reload()
