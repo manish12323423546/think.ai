@@ -22,7 +22,11 @@ import {
   Crown,
   PlusCircle,
   FileText,
-  Layers
+  Layers,
+  Upload,
+  Calendar,
+  DollarSign,
+  Layout
 } from "lucide-react"
 
 // Define navigation items based on roles
@@ -37,107 +41,58 @@ const getNavigationItems = (role: Roles, permissions: string[]) => {
     isActive: false
   })
 
-  // Projects - available to most roles
-  if (permissions.includes('projects:view')) {
+
+  // Think AI Features - admin only
+  if (role === 'admin') {
     items.push({
-      title: "Projects",
-      url: "/dashboard/projects",
-      icon: FolderOpen,
+      title: "Think AI",
+      url: "/dashboard/admin/upload-script",
+      icon: Film,
       items: [
-        ...(permissions.includes('projects:create') ? [{
-          title: "Create Project",
-          url: "/dashboard/projects/create",
-          icon: PlusCircle
-        }] : []),
         {
-          title: "My Projects",
-          url: "/dashboard/projects",
+          title: "Upload Script",
+          url: "/dashboard/admin/upload-script",
+          icon: Upload
+        },
+        {
+          title: "Script Analysis",
+          url: "/dashboard/admin/script-analysis",
           icon: FileText
-        }
-      ]
-    })
-  }
-
-  // Scripts - for writers, directors, admins
-  if (permissions.includes('scripts:view')) {
-    items.push({
-      title: "Scripts",
-      url: "/dashboard/scripts",
-      icon: Edit3,
-      items: [
-        ...(permissions.includes('scripts:create') ? [{
-          title: "New Script",
-          url: "/dashboard/scripts/create",
-          icon: PlusCircle
-        }] : []),
+        },
         {
-          title: "My Scripts",
-          url: "/dashboard/scripts",
-          icon: FileText
-        }
-      ]
-    })
-  }
-
-  // Storyboards - for storyboard artists, directors, producers, admins
-  if (permissions.includes('storyboards:view')) {
-    items.push({
-      title: "Storyboards",
-      url: "/dashboard/storyboards",
-      icon: Palette,
-      items: [
-        ...(permissions.includes('storyboards:create') ? [{
-          title: "New Storyboard",
-          url: "/dashboard/storyboards/create",
-          icon: PlusCircle
-        }] : []),
+          title: "One-Liner",
+          url: "/dashboard/admin/one-liner",
+          icon: Edit3
+        },
         {
-          title: "My Storyboards",
-          url: "/dashboard/storyboards",
-          icon: Layers
-        }
-      ]
-    })
-  }
-
-  // Analytics - for producers, directors, admins
-  if (permissions.includes('analytics:view')) {
-    items.push({
-      title: "Analytics",
-      url: "/dashboard/analytics",
-      icon: BarChart3
-    })
-  }
-
-  // User Management - admin only
-  if (permissions.includes('users:manage')) {
-    items.push({
-      title: "User Management",
-      url: "/dashboard/admin/users",
-      icon: Users,
-      items: [
-        {
-          title: "All Users",
-          url: "/dashboard/admin/users",
+          title: "Character Breakdown",
+          url: "/dashboard/admin/character-breakdown",
           icon: Users
         },
         {
-          title: "Roles & Permissions",
-          url: "/dashboard/admin/roles",
-          icon: Crown
+          title: "Schedule",
+          url: "/dashboard/admin/schedule",
+          icon: Calendar
+        },
+        {
+          title: "Budget",
+          url: "/dashboard/admin/budget",
+          icon: DollarSign
+        },
+        {
+          title: "Storyboard",
+          url: "/dashboard/admin/storyboard",
+          icon: Layers
+        },
+        {
+          title: "Project Overview",
+          url: "/dashboard/admin/project-overview",
+          icon: Layout
         }
       ]
     })
   }
 
-  // Settings - available to admins and some other roles
-  if (permissions.includes('settings:manage') || role === 'admin') {
-    items.push({
-      title: "Settings",
-      url: "/dashboard/settings",
-      icon: Settings
-    })
-  }
 
   return items
 }

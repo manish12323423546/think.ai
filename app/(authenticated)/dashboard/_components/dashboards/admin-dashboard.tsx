@@ -13,7 +13,10 @@ import {
   Plus,
   Calendar,
   FileText,
-  TrendingUp
+  TrendingUp,
+  Upload,
+  Film,
+  Layers
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -92,32 +95,25 @@ const recentActivity = [
 
 const quickActions = [
   {
-    name: "User Management",
-    description: "Manage users and permissions",
-    icon: Users,
-    href: "/dashboard/admin/users",
-    color: "text-blue-500"
-  },
-  {
-    name: "System Settings",
-    description: "Configure system preferences",
-    icon: Settings,
-    href: "/dashboard/admin/settings",
+    name: "Think AI - Upload Script",
+    description: "Upload and analyze scripts",
+    icon: Upload,
+    href: "/dashboard/admin/upload-script",
     color: "text-purple-500"
   },
   {
-    name: "Analytics",
-    description: "View system analytics",
-    icon: BarChart3,
-    href: "/dashboard/admin/analytics",
-    color: "text-green-500"
+    name: "Think AI - Script Analysis",
+    description: "Detailed script breakdown",
+    icon: FileText,
+    href: "/dashboard/admin/script-analysis",
+    color: "text-blue-500"
   },
   {
-    name: "Security",
-    description: "Security and compliance",
-    icon: Shield,
-    href: "/dashboard/admin/security",
-    color: "text-red-500"
+    name: "Think AI - Project Overview",
+    description: "Complete project summary",
+    icon: Film,
+    href: "/dashboard/admin/project-overview",
+    color: "text-green-500"
   }
 ]
 
