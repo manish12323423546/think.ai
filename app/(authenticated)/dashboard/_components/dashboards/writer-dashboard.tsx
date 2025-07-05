@@ -9,7 +9,11 @@ import {
   Plus,
   TrendingUp,
   CheckCircle,
-  Calendar
+  Calendar,
+  Upload,
+  Search,
+  Users,
+  Brain
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -110,6 +114,37 @@ const quickActions = [
     description: "Check upcoming deadlines",
     icon: Calendar,
     href: "/dashboard/scripts/deadlines",
+    color: "text-orange-500"
+  }
+]
+
+const thinkAiActions = [
+  {
+    name: "Upload Script",
+    description: "Process script with AI analysis",
+    icon: Upload,
+    href: "/dashboard/writer/upload-script",
+    color: "text-purple-500"
+  },
+  {
+    name: "Script Analysis",
+    description: "Detailed scene breakdown",
+    icon: Search,
+    href: "/dashboard/writer/script-analysis",
+    color: "text-blue-500"
+  },
+  {
+    name: "One-Liner Generation",
+    description: "Create scene summaries",
+    icon: Brain,
+    href: "/dashboard/writer/one-liner",
+    color: "text-green-500"
+  },
+  {
+    name: "Character Insights",
+    description: "View character analysis",
+    icon: Users,
+    href: "/dashboard/writer/character-breakdown",
     color: "text-orange-500"
   }
 ]
@@ -229,7 +264,7 @@ export function WriterDashboard({ userData }: WriterDashboardProps) {
           </Card>
         </motion.div>
 
-        {/* Quick Actions */}
+        {/* Quick Actions and Think AI */}
         <motion.div 
           className="space-y-4"
           initial={{ opacity: 0, y: 20 }}
@@ -254,6 +289,43 @@ export function WriterDashboard({ userData }: WriterDashboardProps) {
                   <Button 
                     variant="outline" 
                     className="w-full h-auto p-4 justify-start"
+                    asChild
+                  >
+                    <Link href={action.href}>
+                      <action.icon className={`h-5 w-5 mr-3 ${action.color}`} />
+                      <div className="text-left">
+                        <div className="font-medium">{action.name}</div>
+                        <div className="text-sm text-muted-foreground">{action.description}</div>
+                      </div>
+                    </Link>
+                  </Button>
+                </motion.div>
+              ))}
+            </CardContent>
+          </Card>
+
+          {/* Think AI Tools */}
+          <Card className="border-purple-200 bg-purple-50/50">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Brain className="h-5 w-5 text-purple-500" />
+                Think AI Tools
+              </CardTitle>
+              <CardDescription>
+                AI-powered script analysis and development
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              {thinkAiActions.map((action, index) => (
+                <motion.div
+                  key={action.name}
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.5, delay: 0.9 + index * 0.1 }}
+                >
+                  <Button 
+                    variant="outline" 
+                    className="w-full h-auto p-4 justify-start border-purple-200 hover:bg-purple-50"
                     asChild
                   >
                     <Link href={action.href}>

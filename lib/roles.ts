@@ -17,13 +17,29 @@ export const ROLE_PERMISSIONS = {
     'storyboards:view',
     'users:manage',
     'settings:manage',
-    'analytics:view'
+    'analytics:view',
+    // Think AI permissions
+    'thinkai:upload-script',
+    'thinkai:script-analysis',
+    'thinkai:project-overview',
+    'thinkai:one-liner',
+    'thinkai:character-breakdown',
+    'thinkai:schedule',
+    'thinkai:budget',
+    'thinkai:storyboard',
+    'thinkai:export'
   ],
   writer: [
     'scripts:create',
     'scripts:edit',
     'scripts:view',
-    'projects:view'
+    'projects:view',
+    // Think AI permissions
+    'thinkai:upload-script',
+    'thinkai:script-analysis',
+    'thinkai:one-liner',
+    'thinkai:character-breakdown:read',
+    'thinkai:project-overview:limited'
   ],
   producer: [
     'projects:create',
@@ -32,14 +48,29 @@ export const ROLE_PERMISSIONS = {
     'scripts:view',
     'storyboards:view',
     'analytics:view',
-    'users:view'
+    'users:view',
+    // Think AI permissions
+    'thinkai:upload-script',
+    'thinkai:script-analysis',
+    'thinkai:project-overview',
+    'thinkai:one-liner',
+    'thinkai:character-breakdown',
+    'thinkai:schedule',
+    'thinkai:budget',
+    'thinkai:storyboard:read',
+    'thinkai:export'
   ],
   storyboard_artist: [
     'storyboards:create',
     'storyboards:edit',
     'storyboards:view',
     'scripts:view',
-    'projects:view'
+    'projects:view',
+    // Think AI permissions
+    'thinkai:script-analysis:read',
+    'thinkai:character-breakdown:read',
+    'thinkai:storyboard',
+    'thinkai:project-overview:limited'
   ],
   director: [
     'projects:edit',
@@ -48,12 +79,25 @@ export const ROLE_PERMISSIONS = {
     'scripts:edit',
     'storyboards:view',
     'storyboards:edit',
-    'analytics:view'
+    'analytics:view',
+    // Think AI permissions
+    'thinkai:upload-script',
+    'thinkai:script-analysis',
+    'thinkai:project-overview',
+    'thinkai:one-liner',
+    'thinkai:character-breakdown',
+    'thinkai:schedule:read',
+    'thinkai:budget:read',
+    'thinkai:storyboard',
+    'thinkai:export'
   ],
   team_member: [
     'projects:view',
     'scripts:view',
-    'storyboards:view'
+    'storyboards:view',
+    // Think AI permissions
+    'thinkai:script-analysis:read',
+    'thinkai:project-overview:basic'
   ]
 } as const
 
