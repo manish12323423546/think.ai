@@ -1,220 +1,151 @@
-import logging
 from typing import Dict, Any, List
 import json
-import re
-import os
+import logging
+from datetime import datetime, timedelta
+from ...base_config import AGENT_INSTRUCTIONS, get_model_config
 from google import genai
 from google.genai import types
-from ...base_config import AGENT_INSTRUCTIONS, get_model_config
+import os
 
+# Configure logging
+logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 class CrewAllocatorAgent:
+    """
+    🚧 CrewAllocatorAgent (DEPARTMENT SCHEDULING) - GPT-4.1 mini
+    
+    Advanced department scheduling coordination agent.
+    Responsibilities:
+    - Coordinate department-specific scheduling (Camera, Sound, Lighting, Grip)
+    - Manage crew availability and work hour restrictions
+    - Optimize crew assignments across departments
+    - Handle union rules and labor compliance
+    - Generate detailed crew call sheets
+    """
+    
     def __init__(self):
         self.client = genai.Client(api_key=os.environ.get("GOOGLE_API_KEY"))
         self.model_config = get_model_config()
-        self.instructions = AGENT_INSTRUCTIONS["crew_allocator"]
+        self.instructions = """You are a Crew Allocator Agent for film production.
+        Your expertise in advanced department scheduling coordination:
+        1. Coordinate department-specific scheduling across Camera, Sound, Lighting, Grip
+        2. Manage crew availability windows and work hour restrictions
+        3. Optimize crew assignments for maximum efficiency
+        4. Ensure union rules and labor compliance
+        5. Generate detailed crew call sheets and schedules
+        
+        Focus on advanced department scheduling coordination with union compliance."""
         logger.info("CrewAllocatorAgent initialized")
     
-    async def allocate_crew(
-        self, 
-        scene_data: Dict[str, Any], 
-        crew_availability: Dict[str, Any],
-        equipment_inventory: Dict[str, Any] = None
-    ) -> Dict[str, Any]:
-        """Allocate crew and equipment to scenes based on availability and requirements."""
-        try:
-            logger.info("Starting crew allocation")
-            
-            # Extract scenes and validate input
-            scenes = []
-            if isinstance(scene_data, dict):
-                if 'scenes' in scene_data:
-                    scenes = scene_data['scenes']
-                elif 'parsed_data' in scene_data and isinstance(scene_data['parsed_data'], dict):
-                    scenes = scene_data['parsed_data'].get('scenes', [])
-            
-            if not scenes:
-                raise ValueError("No scenes provided in scene_data")
-            
-            logger.debug(f"Processing {len(scenes)} scenes")
-            
-            prompt = f"""You are a film production crew allocator. Your task is to create a detailed crew and equipment allocation plan.
-
-IMPORTANT: You must respond with ONLY valid JSON data in the exact format specified below. Do not include any other text or explanations.
-
-Required JSON format:
-{{
-    "crew_assignments": [
-        {{
-            "crew_member": "string",
-            "role": "string",
-            "assigned_scenes": ["scene_id1", "scene_id2"],
-            "work_hours": number,
-            "turnaround_hours": number,
-            "meal_break_interval": number,
-            "equipment_assigned": ["equipment1", "equipment2"]
-        }}
-    ],
-    "equipment_assignments": [
-        {{
-            "equipment_id": "string",
-            "type": "string",
-            "assigned_scenes": ["scene_id1", "scene_id2"],
-            "setup_time_minutes": number,
-            "assigned_crew": ["crew_member1", "crew_member2"]
-        }}
-    ],
-    "department_schedules": {{
-        "camera": {{
-            "crew": ["crew_member1", "crew_member2"],
-            "equipment": ["equipment1", "equipment2"],
-            "notes": ["note1", "note2"]
-        }},
-        "sound": {{
-            "crew": ["crew_member1", "crew_member2"],
-            "equipment": ["equipment1", "equipment2"],
-            "notes": ["note1", "note2"]
-        }}
-    }},
-    "availability_windows": {{
-        "crew_member_id": {{
-            "available_dates": ["YYYY-MM-DD"],
-            "daily_hours": {{"start": "HH:MM", "end": "HH:MM"}},
-            "restrictions": ["restriction1", "restriction2"]
-        }}
-    }},
-    "resource_conflicts": [
-        {{
-            "type": "crew|equipment",
-            "resource_id": "string",
-            "conflicting_scenes": ["scene_id1", "scene_id2"],
-            "reason": "string"
-        }}
-    ],
-    "allocation_notes": ["note1", "note2"]
-}}
-
-Consider these requirements:
-        - Actor availability windows
-        - Crew work hour restrictions and union rules
-        - Equipment sharing optimization
-        - Department-specific requirements
-        - Setup and wrap time requirements
+    async def allocate_departments(self, scene_data: Dict[str, Any], crew_availability: Dict[str, Any] = None) -> Dict[str, Any]:
+        """Allocate crew across departments with union compliance."""
+        logger.info("Starting department crew allocation")
         
-        Scene Data:
-{json.dumps(scenes, indent=2)}
+        if not scene_data or not isinstance(scene_data, dict):
+            logger.error("Invalid scene data received")
+            return {"error": "Invalid scene data format"}
         
-        Crew Availability:
-        {json.dumps(crew_availability, indent=2)}
+        scenes = scene_data.get('scenes', [])
+        logger.info(f"Processing crew allocation for {len(scenes)} scenes")
         
-        Equipment Inventory:
-        {json.dumps(equipment_inventory, indent=2) if equipment_inventory else "Using standard equipment package"}
-
-Remember: Return ONLY the JSON data structure. No other text."""
+        # Generate department schedules
+        department_schedules = self._generate_department_schedules(scenes)
+        
+        # Create crew assignments
+        crew_assignments = self._create_crew_assignments(scenes, department_schedules)
+        
+        # Generate work hour compliance
+        work_hour_compliance = self._generate_work_hour_compliance(crew_assignments)
+        
+        # Create call sheet details
+        call_sheet_details = self._create_call_sheet_details(scenes, crew_assignments)
+        
+        # Calculate department efficiency
+        department_efficiency = self._calculate_department_efficiency(department_schedules, crew_assignments)
+        
+        result = {
+            "timestamp": datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+            "department_schedules": department_schedules,
+            "crew_assignments": crew_assignments,
+            "work_hour_compliance": work_hour_compliance,
+            "call_sheet_details": call_sheet_details,
+            "department_efficiency": department_efficiency,
+            "union_compliance_notes": self._generate_union_compliance_notes(crew_assignments)
+        }
+        
+        logger.info(f"Generated department allocation for {len(scenes)} scenes")
+        return result
+    
+    def _generate_department_schedules(self, scenes: List[Dict[str, Any]]) -> Dict[str, Any]:
+        """Generate department-specific schedules."""
+        departments = {
+            "camera": {
+                "crew_requirements": {},
+                "equipment_schedule": {},
+                "scene_coverage": [],
+                "daily_assignments": []
+            },
+            "sound": {
+                "crew_requirements": {},
+                "equipment_schedule": {},
+                "scene_coverage": [],
+                "daily_assignments": []
+            },
+            "lighting": {
+                "crew_requirements": {},
+                "equipment_schedule": {},
+                "scene_coverage": [],
+                "daily_assignments": []
+            },
+            "grip": {
+                "crew_requirements": {},
+                "equipment_schedule": {},
+                "scene_coverage": [],
+                "daily_assignments": []
+            }
+        }
+        
+        for day_index, scene in enumerate(scenes):
+            scene_number = scene.get('scene_number', '0')
             
-            # Combine instructions with prompt
-            full_prompt = f"{self.instructions}\n\n{prompt}"
-
-            response = self.client.models.generate_content(
-                model=self.model_config["model"],
-                contents=full_prompt,
-                config=types.GenerateContentConfig(
-                    temperature=self.model_config["temperature"],
-                    max_output_tokens=self.model_config["max_output_tokens"],
-                    top_p=self.model_config["top_p"],
-                    top_k=self.model_config["top_k"],
-                    response_mime_type="application/json"
-                )
-            )
-
-            # Safe content extraction
-            def extract_content_safely(response):
-                if not hasattr(response, 'candidates') or not response.candidates:
-                    raise ValueError("No candidates in Gemini response")
-                
-                candidate = response.candidates[0]
-                if not hasattr(candidate, 'content') or not candidate.content:
-                    raise ValueError("Empty content in Gemini response")
-                
-                if not hasattr(candidate.content, 'parts') or not candidate.content.parts:
-                    raise ValueError("No content parts in Gemini response")
-                
-                text_content = candidate.content.parts[0].text
-                if not text_content:
-                    raise ValueError("Empty text content in Gemini response")
-                
-                return text_content
-
-            try:
-                result_final_output = extract_content_safely(response)
-            except ValueError as e:
-                logger.error(f"Validation error: {e}")
-                # Create a basic valid response
-                logger.info("Generating fallback crew allocation")
-                fallback_response = self._generate_fallback_allocation(scenes, crew_availability)
-                return fallback_response
-            try:
-                # Log the raw response for debugging
-                logger.debug(f"Raw API response: {result_final_output}")
-                
-                # First, validate that we have a response
-                if not result_final_output or not result_final_output.strip():
-                    raise ValueError("Empty response from API")
-                
-                # Clean the response - try to extract JSON
-                cleaned_response = self._clean_and_extract_json(result_final_output)
-                if not cleaned_response:
-                    raise ValueError("Could not find valid JSON in response")
-                
-                # Try to parse the JSON
-                allocation_result = json.loads(cleaned_response)
-                logger.info("Successfully parsed crew allocation result")
-                
-                # Validate required fields
-                required_fields = ['crew_assignments', 'equipment_assignments', 'availability_windows', 'resource_conflicts']
-                for field in required_fields:
-                    if field not in allocation_result:
-                        raise ValueError(f"Missing required field: {field}")
+            # Camera department requirements
+            camera_complexity = self._assess_camera_complexity(scene)
+            departments["camera"]["scene_coverage"].append({
+                "scene": scene_number,
+                "day": day_index + 1,
+                "complexity": camera_complexity,
+                "crew_needed": self._calculate_camera_crew_needed(camera_complexity)
+            })
             
-                # Validate crew assignments
-                for assignment in allocation_result.get('crew_assignments', []):
-                    required_fields = ['crew_member', 'role', 'assigned_scenes']
-                    for field in required_fields:
-                        if field not in assignment:
-                            raise ValueError(f"Missing required crew assignment field: {field}")
-                
-                # Validate availability windows
-                for crew_id, window in allocation_result.get('availability_windows', {}).items():
-                    required_fields = ['available_dates', 'daily_hours']
-                    for field in required_fields:
-                        if field not in window:
-                            raise ValueError(f"Missing required availability window field: {field}")
-                
-                # Validate resource conflicts
-                for conflict in allocation_result.get('resource_conflicts', []):
-                    required_fields = ['type', 'resource_id', 'conflicting_scenes']
-                    for field in required_fields:
-                        if field not in conflict:
-                            raise ValueError(f"Missing required resource conflict field: {field}")
-                
-                # Validate the crew assignments against union rules
-                self._validate_crew_assignments(allocation_result)
-                logger.info("Crew assignments validated")
+            # Sound department requirements
+            sound_complexity = self._assess_sound_complexity(scene)
+            departments["sound"]["scene_coverage"].append({
+                "scene": scene_number,
+                "day": day_index + 1,
+                "complexity": sound_complexity,
+                "crew_needed": self._calculate_sound_crew_needed(sound_complexity)
+            })
             
-                return allocation_result
-            except json.JSONDecodeError as e:
-                logger.error(f"Failed to parse crew allocation result: {str(e)}")
-                logger.debug(f"Raw response: {result_final_output}")
-                
-                # Create a basic valid response
-                logger.info("Generating fallback crew allocation")
-                fallback_response = self._generate_fallback_allocation(scenes, crew_availability)
-                return fallback_response
-                
-        except Exception as e:
-            logger.error(f"Error during crew allocation: {str(e)}", exc_info=True)
-            raise
+            # Lighting department requirements
+            lighting_complexity = self._assess_lighting_complexity(scene)
+            departments["lighting"]["scene_coverage"].append({
+                "scene": scene_number,
+                "day": day_index + 1,
+                "complexity": lighting_complexity,
+                "crew_needed": self._calculate_lighting_crew_needed(lighting_complexity)
+            })
+            
+            # Grip department requirements
+            grip_complexity = self._assess_grip_complexity(scene)
+            departments["grip"]["scene_coverage"].append({
+                "scene": scene_number,
+                "day": day_index + 1,
+                "complexity": grip_complexity,
+                "crew_needed": self._calculate_grip_crew_needed(grip_complexity)
+            })
+        
+        return departments
     
     def _clean_and_extract_json(self, text: str) -> str:
         """Clean and extract JSON from text response."""

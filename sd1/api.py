@@ -270,25 +270,43 @@ async def estimate_budget(request: BudgetRequest):
 
 @app.post("/api/budget")
 async def estimate_budget_frontend(request: dict):
-    """Frontend-compatible budget estimation endpoint."""
+    """Frontend-compatible budget estimation endpoint with comprehensive sub-agent support."""
     try:
-        script_results = request.get("script_results", {})
-        character_results = request.get("character_results", {})
-        schedule_results = request.get("schedule_results", {})
-        
-        production_data = {
-            "script_results": script_results,
-            "character_results": character_results,
-            "schedule_results": schedule_results
-        }
+        # Handle both nested and flat request structures
+        if "production_data" in request:
+            # New nested structure from updated frontend
+            production_data = request.get("production_data", {})
+            budget_constraints = request.get("budget_constraints", {})
+        else:
+            # Legacy flat structure for backwards compatibility
+            script_results = request.get("script_results", {})
+            character_results = request.get("character_results", {})
+            schedule_results = request.get("schedule_results", {})
+            
+            production_data = {
+                "script_results": script_results,
+                "character_results": character_results,
+                "schedule_results": schedule_results
+            }
+            budget_constraints = request.get("budget_constraints", {})
         
         result = await budgeting_coordinator.process_budget_estimation({
             "production_data": production_data,
-            "budget_constraints": request.get("budget_constraints", {})
+            "budget_constraints": budget_constraints
         })
         return {"success": True, "data": result}
     except Exception as e:
         logger.error(f"Error in budget estimation: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/api/budget/verify-agents")
+async def verify_budget_agents():
+    """Verify all budget sub-agents are properly connected."""
+    try:
+        verification_results = budgeting_coordinator.verify_sub_agent_connections()
+        return {"success": True, "data": verification_results}
+    except Exception as e:
+        logger.error(f"Error in budget agent verification: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 # Storyboard endpoints

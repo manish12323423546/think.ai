@@ -3,26 +3,44 @@ import json
 import os
 import logging
 from datetime import datetime
-from .agents.parser_agent import ScriptParserAgent
-from .agents.metadata_agent import MetadataAgent
-from .agents.validator_agent import ValidatorAgent
+from .agents.script_parser_agent import ScriptParserAgent
+from .agents.eighths_calculator_agent import EighthsCalculatorAgent
+from .agents.breakdown_specialist_agent import BreakdownSpecialistAgent
+from .agents.department_coordinator_agent import DepartmentCoordinatorAgent
+from .agents.production_analyzer_agent import ProductionAnalyzerAgent
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 class ScriptIngestionCoordinator:
+    """
+    🎬 Agent 1: Script Ingestion Coordinator (Main Orchestrator)
+    
+    Coordinates 5 specialized sub-agents:
+    ├── 🎬 ScriptParserAgent (FOUNDATIONAL)
+    ├── ✅ EighthsCalculatorAgent (INDUSTRY STANDARD)
+    ├── ✅ BreakdownSpecialistAgent (AD WORKFLOW)
+    ├── ✅ DepartmentCoordinatorAgent (CREW NEEDS)
+    └── ✅ ProductionAnalyzerAgent (RISK ASSESSMENT)
+    """
+    
     def __init__(self):
-        logger.info("Initializing ScriptIngestionCoordinator")
-        self.parser = ScriptParserAgent()
-        self.metadata_extractor = MetadataAgent()
-        self.validator = ValidatorAgent()
+        logger.info("Initializing ScriptIngestionCoordinator with 5 specialized agents")
+        
+        # Initialize all 5 specialized agents
+        self.script_parser = ScriptParserAgent()
+        self.eighths_calculator = EighthsCalculatorAgent()
+        self.breakdown_specialist = BreakdownSpecialistAgent()
+        self.department_coordinator = DepartmentCoordinatorAgent()
+        self.production_analyzer = ProductionAnalyzerAgent()
         
         # Create necessary directories
         os.makedirs("data/scripts", exist_ok=True)
         os.makedirs("data/scripts/metadata", exist_ok=True)
         os.makedirs("data/scripts/validation", exist_ok=True)
         logger.info("Data directories ensured")
+        logger.info("All 5 specialized agents initialized successfully")
     
     async def process_script(
         self,
@@ -31,7 +49,7 @@ class ScriptIngestionCoordinator:
         validation_level: str = "lenient"
     ) -> Dict[str, Any]:
         """
-        Process a script through the complete ingestion pipeline.
+        Process a script through the complete 5-agent pipeline.
         
         Args:
             script_text: The input script text
@@ -39,145 +57,193 @@ class ScriptIngestionCoordinator:
             validation_level: Validation strictness ('strict' or 'lenient')
             
         Returns:
-            Dict containing processed results including parsed data, metadata, and validation
+            Dict containing processed results from all 5 agents
         """
-        logger.info("Starting script processing pipeline")
+        logger.info("Starting 5-agent script processing pipeline")
         processing_start = datetime.now()
-        validation_result = None  # Initialize validation_result at the start
         
         try:
             # Initialize processing status
             processing_status = {
                 "started_at": processing_start.isoformat(),
-                "current_stage": "parsing",
+                "current_stage": "script_parsing",
                 "completed_stages": [],
                 "errors": [],
-                "warnings": []
+                "warnings": [],
+                "agents_used": ["ScriptParserAgent", "EighthsCalculatorAgent", 
+                               "BreakdownSpecialistAgent", "DepartmentCoordinatorAgent", 
+                               "ProductionAnalyzerAgent"]
             }
             
-            # Step 1: Parse the script
-            logger.info("Step 1: Parsing script")
+            # 🎬 STAGE 1: Script Parsing (FOUNDATIONAL)
+            logger.info("🎬 Stage 1: Script Parsing with ScriptParserAgent")
             try:
-                parsed_data = await self.parser.parse_script(script_text)
+                parsed_data = await self.script_parser.parse_script(script_text)
                 if "error" in parsed_data:
                     raise ValueError(f"Script parsing failed: {parsed_data['error']}")
                 
                 processing_status["completed_stages"].append({
-                    "stage": "parsing",
+                    "stage": "script_parsing",
+                    "agent": "ScriptParserAgent",
                     "completed_at": datetime.now().isoformat(),
                     "success": True
                 })
+                logger.info("✅ Script parsing completed successfully")
             except Exception as e:
-                logger.error(f"Error in parsing stage: {str(e)}")
+                logger.error(f"❌ Error in script parsing stage: {str(e)}")
                 processing_status["errors"].append({
-                    "stage": "parsing",
+                    "stage": "script_parsing",
+                    "agent": "ScriptParserAgent",
                     "error": str(e),
                     "timestamp": datetime.now().isoformat()
                 })
                 raise
             
-            # Step 2: Extract metadata with department focus
-            logger.info("Step 2: Extracting metadata")
-            processing_status["current_stage"] = "metadata"
+            # 🎬 STAGE 2: Eighths Calculation (INDUSTRY STANDARD)
+            logger.info("✅ Stage 2: Eighths Calculation with EighthsCalculatorAgent")
+            processing_status["current_stage"] = "eighths_calculation"
             try:
-                metadata = await self.metadata_extractor.extract_metadata(parsed_data)
-                if "error" in metadata:
-                    raise ValueError(f"Metadata extraction failed: {metadata['error']}")
-                
-                # Add department-specific metadata if focus specified
-                if department_focus:
-                    metadata["department_focus"] = {
-                        dept: self._extract_department_metadata(parsed_data, dept)
-                        for dept in department_focus
-                    }
+                eighths_data = self.eighths_calculator.calculate_eighths(parsed_data)
+                if "error" in eighths_data:
+                    raise ValueError(f"Eighths calculation failed: {eighths_data['error']}")
                 
                 processing_status["completed_stages"].append({
-                    "stage": "metadata",
+                    "stage": "eighths_calculation",
+                    "agent": "EighthsCalculatorAgent",
                     "completed_at": datetime.now().isoformat(),
                     "success": True
                 })
+                logger.info("✅ Eighths calculation completed successfully")
             except Exception as e:
-                logger.error(f"Error in metadata stage: {str(e)}")
+                logger.error(f"❌ Error in eighths calculation stage: {str(e)}")
                 processing_status["errors"].append({
-                    "stage": "metadata",
-                    "error": str(e),
-                    "timestamp": datetime.now().isoformat()
-                })
-                raise
-            
-            # Step 3: Validate the data
-            logger.info("Step 3: Validating data")
-            processing_status["current_stage"] = "validation"
-            validation_error = None
-            critical_issues = []  # Initialize here to avoid reference errors
-            
-            try:
-                validation_result = await self.validator.validate_data(
-                    parsed_data,
-                    metadata
-                )
-                
-                # Process validation results
-                validation_issues = validation_result.get("validation_report", {}).get("issues", [])
-                if validation_issues:
-                    # Categorize issues by severity
-                    warnings = []
-                    for issue in validation_issues:
-                        if issue.get("type") == "error":
-                            critical_issues.append(issue)
-                        else:
-                            warnings.append(issue)
-                    
-                    # Update processing status with issues
-                    if warnings:
-                        processing_status["warnings"].extend([{
-                            "type": "validation_warning",
-                            "message": warning.get("description", "No description"),
-                            "scene": warning.get("scene_number", "N/A"),
-                            "category": warning.get("category", "Unknown")
-                        } for warning in warnings])
-                    
-                    # Handle critical issues based on validation level
-                    if critical_issues:
-                        error_msg = self._format_validation_errors(critical_issues)
-                        if validation_level == "strict":
-                            validation_error = ValueError(f"Strict validation failed:\n{error_msg}")
-                        else:
-                            processing_status["warnings"].append({
-                                "type": "validation_critical",
-                                "message": "Critical validation issues found but proceeding (lenient mode)",
-                                "details": error_msg
-                            })
-                
-                processing_status["completed_stages"].append({
-                    "stage": "validation",
-                    "completed_at": datetime.now().isoformat(),
-                    "success": not bool(critical_issues)
-                })
-                
-            except Exception as e:
-                logger.error(f"Error in validation stage: {str(e)}")
-                processing_status["errors"].append({
-                    "stage": "validation",
+                    "stage": "eighths_calculation",
+                    "agent": "EighthsCalculatorAgent",
                     "error": str(e),
                     "timestamp": datetime.now().isoformat()
                 })
                 if validation_level == "strict":
                     raise
+                eighths_data = {"error": str(e)}
             
-            # If we have a validation error in strict mode, raise it after recording status
-            if validation_error and validation_level == "strict":
-                raise validation_error
+            # 🎬 STAGE 3: Scene Breakdown (AD WORKFLOW)
+            logger.info("✅ Stage 3: Scene Breakdown with BreakdownSpecialistAgent")
+            processing_status["current_stage"] = "scene_breakdown"
+            try:
+                breakdown_data = self.breakdown_specialist.analyze_scene_breakdown(parsed_data)
+                if "error" in breakdown_data:
+                    raise ValueError(f"Scene breakdown failed: {breakdown_data['error']}")
+                
+                processing_status["completed_stages"].append({
+                    "stage": "scene_breakdown",
+                    "agent": "BreakdownSpecialistAgent",
+                    "completed_at": datetime.now().isoformat(),
+                    "success": True
+                })
+                logger.info("✅ Scene breakdown completed successfully")
+            except Exception as e:
+                logger.error(f"❌ Error in scene breakdown stage: {str(e)}")
+                processing_status["errors"].append({
+                    "stage": "scene_breakdown",
+                    "agent": "BreakdownSpecialistAgent",
+                    "error": str(e),
+                    "timestamp": datetime.now().isoformat()
+                })
+                if validation_level == "strict":
+                    raise
+                breakdown_data = {"error": str(e)}
             
-            # Prepare final result
+            # 🎬 STAGE 4: Department Coordination (CREW NEEDS)
+            logger.info("✅ Stage 4: Department Coordination with DepartmentCoordinatorAgent")
+            processing_status["current_stage"] = "department_coordination"
+            try:
+                department_data = self.department_coordinator.coordinate_departments(parsed_data)
+                if "error" in department_data:
+                    raise ValueError(f"Department coordination failed: {department_data['error']}")
+                
+                processing_status["completed_stages"].append({
+                    "stage": "department_coordination",
+                    "agent": "DepartmentCoordinatorAgent",
+                    "completed_at": datetime.now().isoformat(),
+                    "success": True
+                })
+                logger.info("✅ Department coordination completed successfully")
+            except Exception as e:
+                logger.error(f"❌ Error in department coordination stage: {str(e)}")
+                processing_status["errors"].append({
+                    "stage": "department_coordination",
+                    "agent": "DepartmentCoordinatorAgent",
+                    "error": str(e),
+                    "timestamp": datetime.now().isoformat()
+                })
+                if validation_level == "strict":
+                    raise
+                department_data = {"error": str(e)}
+            
+            # 🎬 STAGE 5: Production Analysis (RISK ASSESSMENT)
+            logger.info("✅ Stage 5: Production Analysis with ProductionAnalyzerAgent")
+            processing_status["current_stage"] = "production_analysis"
+            try:
+                # Combine all metadata for comprehensive analysis
+                combined_metadata = {
+                    "eighths_data": eighths_data,
+                    "breakdown_data": breakdown_data,
+                    "department_data": department_data
+                }
+                
+                production_analysis = self.production_analyzer.analyze_production(
+                    parsed_data, combined_metadata)
+                if "error" in production_analysis:
+                    raise ValueError(f"Production analysis failed: {production_analysis['error']}")
+                
+                processing_status["completed_stages"].append({
+                    "stage": "production_analysis",
+                    "agent": "ProductionAnalyzerAgent",
+                    "completed_at": datetime.now().isoformat(),
+                    "success": True
+                })
+                logger.info("✅ Production analysis completed successfully")
+            except Exception as e:
+                logger.error(f"❌ Error in production analysis stage: {str(e)}")
+                processing_status["errors"].append({
+                    "stage": "production_analysis",
+                    "agent": "ProductionAnalyzerAgent",
+                    "error": str(e),
+                    "timestamp": datetime.now().isoformat()
+                })
+                if validation_level == "strict":
+                    raise
+                production_analysis = {"error": str(e)}
+            
+            # 🎬 STAGE 6: Data Integration and Finalization
+            logger.info("🎯 Stage 6: Integrating all agent outputs")
+            processing_status["current_stage"] = "data_integration"
+            
+            # Create comprehensive result structure
             result = {
                 "parsed_data": parsed_data,
-                "metadata": metadata,
-                "validation": validation_result,  # This will now always be defined
+                "metadata": self._integrate_metadata(
+                    eighths_data, breakdown_data, department_data, production_analysis),
+                "agent_outputs": {
+                    "script_parser": parsed_data,
+                    "eighths_calculator": eighths_data,
+                    "breakdown_specialist": breakdown_data,
+                    "department_coordinator": department_data,
+                    "production_analyzer": production_analysis
+                },
                 "processing_status": processing_status,
-                "statistics": self._generate_statistics(parsed_data, metadata),
-                "ui_metadata": self._generate_ui_metadata(parsed_data, metadata)
+                "statistics": self._generate_comprehensive_statistics(
+                    parsed_data, eighths_data, breakdown_data, department_data, production_analysis),
+                "ui_metadata": self._generate_ui_metadata(
+                    parsed_data, eighths_data, breakdown_data, department_data, production_analysis)
             }
+            
+            # Add department-specific metadata if focus specified
+            if department_focus:
+                result["metadata"]["department_focus"] = {
+                    dept: self._extract_department_metadata(parsed_data, department_data, dept)
+                    for dept in department_focus
+                }
             
             # Save results
             try:
@@ -196,11 +262,11 @@ class ScriptIngestionCoordinator:
             processing_status["completed_at"] = datetime.now().isoformat()
             processing_status["duration"] = str(datetime.now() - processing_start)
             
-            logger.info("Script processing completed successfully")
+            logger.info("🎉 5-agent script processing completed successfully")
             return result
             
         except Exception as e:
-            logger.error(f"Script processing failed: {str(e)}", exc_info=True)
+            logger.error(f"❌ 5-agent script processing failed: {str(e)}", exc_info=True)
             if processing_status:
                 processing_status["current_stage"] = "failed"
                 processing_status["failed_at"] = datetime.now().isoformat()
@@ -209,22 +275,117 @@ class ScriptIngestionCoordinator:
             return {
                 "error": str(e),
                 "status": "failed",
-                "processing_status": processing_status,
-                "validation": validation_result  # Include validation_result even in error case
+                "processing_status": processing_status
             }
     
-    def _extract_department_metadata(
-        self,
-        parsed_data: Dict[str, Any],
-        department: str
-    ) -> Dict[str, Any]:
-        """Extract department-specific metadata from parsed data."""
+    def _integrate_metadata(self, eighths_data: Dict[str, Any], 
+                           breakdown_data: Dict[str, Any],
+                           department_data: Dict[str, Any],
+                           production_analysis: Dict[str, Any]) -> Dict[str, Any]:
+        """Integrate metadata from all 5 agents into unified structure."""
+        integrated_metadata = {
+            "timestamp": datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+            "agent_integration": "5-agent specialized pipeline"
+        }
+        
+        # Integrate eighths data
+        if "eighths_breakdown" in eighths_data:
+            integrated_metadata["eighths_breakdown"] = eighths_data["eighths_breakdown"]
+            integrated_metadata["industry_standards"] = eighths_data.get("industry_standards", {})
+        
+        # Integrate breakdown data
+        if "time_of_day_breakdown" in breakdown_data:
+            integrated_metadata["time_of_day_breakdown"] = breakdown_data["time_of_day_breakdown"]
+            integrated_metadata["scene_breakdown_cards"] = breakdown_data.get("scene_breakdown_cards", [])
+            integrated_metadata["scheduling_analysis"] = breakdown_data.get("scheduling_analysis", {})
+        
+        # Integrate department data
+        if "crew_requirements" in department_data:
+            integrated_metadata["detailed_crew_requirements"] = department_data["crew_requirements"]
+            integrated_metadata["department_analysis"] = {
+                "camera": department_data.get("camera_department", {}),
+                "sound": department_data.get("sound_department", {}),
+                "art": department_data.get("art_department", {}),
+                "costume": department_data.get("costume_department", {})
+            }
+            integrated_metadata["resource_sharing"] = department_data.get("resource_sharing", {})
+        
+        # Integrate production analysis
+        if "complexity_analysis" in production_analysis:
+            integrated_metadata["technical_complexity"] = production_analysis["complexity_analysis"]["scene_complexity_scores"]
+            integrated_metadata["risk_assessment"] = production_analysis.get("risk_assessment", {})
+            integrated_metadata["feasibility_assessment"] = production_analysis.get("feasibility_assessment", {})
+            integrated_metadata["production_recommendations"] = production_analysis.get("recommendations", [])
+        
+        # Generate global requirements from all agents
+        integrated_metadata["global_requirements"] = self._generate_global_requirements(
+            breakdown_data, department_data)
+        
+        return integrated_metadata
+    
+    def _generate_global_requirements(self, breakdown_data: Dict[str, Any], 
+                                    department_data: Dict[str, Any]) -> Dict[str, Any]:
+        """Generate global requirements from agent outputs."""
+        global_requirements = {
+            "equipment": set(),
+            "props": set(),
+            "special_effects": set(),
+            "crew_specialties": set()
+        }
+        
+        # Extract from department data
+        if "camera_department" in department_data:
+            camera_dept = department_data["camera_department"]
+            global_requirements["equipment"].update(camera_dept.get("equipment_needed", []))
+            global_requirements["equipment"].update(camera_dept.get("special_rigs", []))
+        
+        if "sound_department" in department_data:
+            sound_dept = department_data["sound_department"]
+            global_requirements["equipment"].update(sound_dept.get("equipment_needed", []))
+        
+        if "art_department" in department_data:
+            art_dept = department_data["art_department"]
+            for category in art_dept.get("prop_categories", {}).values():
+                global_requirements["props"].update(category if isinstance(category, list) else [])
+        
+        # Extract from breakdown data
+        if "scene_breakdown_cards" in breakdown_data:
+            for card in breakdown_data["scene_breakdown_cards"]:
+                global_requirements["equipment"].update(card.get("special_equipment", []))
+                if card.get("weather", {}).get("effects_needed"):
+                    global_requirements["special_effects"].update(card["weather"]["effects_needed"])
+        
+        # Convert sets to lists for JSON serialization
+        for key in global_requirements:
+            global_requirements[key] = list(global_requirements[key])
+        
+        return global_requirements
+    
+    def _extract_department_metadata(self, parsed_data: Dict[str, Any],
+                                   department_data: Dict[str, Any],
+                                   department: str) -> Dict[str, Any]:
+        """Extract department-specific metadata from parsed data and department analysis."""
         metadata = {
             "relevant_scenes": [],
             "requirements": set(),
-            "technical_notes": []
+            "technical_notes": [],
+            "crew_needs": {},
+            "equipment_list": []
         }
         
+        # Extract from department coordinator output
+        dept_lower = department.lower()
+        if f"{dept_lower}_department" in department_data:
+            dept_data = department_data[f"{dept_lower}_department"]
+            
+            if "scene_requirements" in dept_data:
+                for scene_req in dept_data["scene_requirements"]:
+                    metadata["relevant_scenes"].append(scene_req.get("scene"))
+            
+            if "equipment_needed" in dept_data:
+                metadata["equipment_list"].extend(dept_data["equipment_needed"])
+        
+        # Extract from parsed scene data
         for scene in parsed_data.get("scenes", []):
             dept_notes = scene.get("department_notes", {}).get(department, [])
             if dept_notes:
@@ -241,54 +402,106 @@ class ScriptIngestionCoordinator:
         metadata["requirements"] = list(metadata["requirements"])
         return metadata
     
-    def _generate_statistics(
-        self,
-        parsed_data: Dict[str, Any],
-        metadata: Dict[str, Any]
-    ) -> Dict[str, Any]:
-        """Generate comprehensive statistics from processed data."""
-        stats = metadata.get("statistics", {}).copy()
+    def _generate_comprehensive_statistics(self, parsed_data: Dict[str, Any],
+                                         eighths_data: Dict[str, Any],
+                                         breakdown_data: Dict[str, Any],
+                                         department_data: Dict[str, Any],
+                                         production_analysis: Dict[str, Any]) -> Dict[str, Any]:
+        """Generate comprehensive statistics from all agent outputs."""
+        stats = {
+            "agent_summary": {
+                "total_agents": 5,
+                "successful_agents": sum(1 for data in [eighths_data, breakdown_data, 
+                                                      department_data, production_analysis] 
+                                       if "error" not in data)
+            }
+        }
         
-        # Add scene complexity metrics
+        # Basic scene statistics
         scenes = parsed_data.get("scenes", [])
         stats.update({
-            "complex_scenes": len([
-                s for s in scenes
-                if len(s.get("technical_cues", [])) > 3
-            ]),
-            "dialogue_heavy_scenes": len([
-                s for s in scenes
-                if len(s.get("dialogues", [])) > 10
-            ]),
-            "effects_required": len(metadata.get("global_requirements", {})
-                .get("special_effects", []))
+            "total_scenes": len(scenes),
+            "total_characters": len(set(char for scene in scenes 
+                                      for char in scene.get("main_characters", []))),
+            "total_locations": len(set(scene.get("location", {}).get("place", "") 
+                                     for scene in scenes))
         })
+        
+        # Eighths statistics
+        if "eighths_breakdown" in eighths_data:
+            stats["eighths_summary"] = {
+                "total_eighths": eighths_data["eighths_breakdown"].get("total_script_eighths", 0),
+                "estimated_days": eighths_data["eighths_breakdown"].get("estimated_total_shoot_days", 0)
+            }
+        
+        # Complexity statistics
+        if "complexity_analysis" in production_analysis:
+            complexity = production_analysis["complexity_analysis"]
+            stats["complexity_summary"] = {
+                "average_complexity": complexity.get("average_complexity", 0),
+                "high_complexity_scenes": len(complexity.get("high_complexity_scenes", []))
+            }
+        
+        # Department statistics
+        if "crew_requirements" in department_data:
+            crew_reqs = department_data["crew_requirements"]
+            total_crew = sum(req.get("total_crew", 0) for req in crew_reqs)
+            stats["crew_summary"] = {
+                "average_crew_size": round(total_crew / len(crew_reqs), 1) if crew_reqs else 0,
+                "total_crew_hours": sum(req.get("total_hours", 0) for req in crew_reqs)
+            }
         
         return stats
     
-    def _generate_ui_metadata(
-        self,
-        parsed_data: Dict[str, Any],
-        metadata: Dict[str, Any]
-    ) -> Dict[str, Any]:
+    def _generate_ui_metadata(self, parsed_data: Dict[str, Any],
+                            eighths_data: Dict[str, Any],
+                            breakdown_data: Dict[str, Any],
+                            department_data: Dict[str, Any],
+                            production_analysis: Dict[str, Any]) -> Dict[str, Any]:
         """Generate metadata specifically for UI rendering."""
-        return {
-            "color_coding": metadata.get("color_coding", {}),
-            "scene_complexity": {
-                str(scene.get("scene_number")): len(scene.get("technical_cues", []))
-                for scene in parsed_data.get("scenes", [])
+        ui_metadata = {
+            "agent_status": {
+                "script_parser": "error" not in parsed_data,
+                "eighths_calculator": "error" not in eighths_data,
+                "breakdown_specialist": "error" not in breakdown_data,
+                "department_coordinator": "error" not in department_data,
+                "production_analyzer": "error" not in production_analysis
             },
-            "timeline_data": parsed_data.get("timeline", {}),
-            "department_views": {
-                dept: {
-                    "scenes": scenes,
-                    "requirements": reqs
-                }
-                for dept, data in metadata.get("department_focus", {}).items()
-                for scenes, reqs in [(data.get("relevant_scenes", []),
-                                    data.get("requirements", []))]
-            }
+            "visualization_data": {},
+            "dashboard_summary": {}
         }
+        
+        # Scene complexity for visualization
+        if "complexity_analysis" in production_analysis:
+            complexity_scores = production_analysis["complexity_analysis"].get("scene_complexity_scores", [])
+            ui_metadata["visualization_data"]["scene_complexity"] = {
+                str(scene["scene"]): scene["complexity_score"] 
+                for scene in complexity_scores if isinstance(scene, dict)
+            }
+        
+        # Timeline data
+        ui_metadata["timeline_data"] = parsed_data.get("timeline", {})
+        
+        # Color coding from breakdown specialist
+        if "time_of_day_breakdown" in breakdown_data:
+            ui_metadata["color_coding"] = {
+                "time_colors": {
+                    "DAY": "#FFD700",
+                    "NIGHT": "#191970", 
+                    "DUSK": "#483D8B",
+                    "DAWN": "#FFA07A"
+                }
+            }
+        
+        # Dashboard summary
+        scenes_count = len(parsed_data.get("scenes", []))
+        ui_metadata["dashboard_summary"] = {
+            "total_scenes": scenes_count,
+            "agents_completed": sum(ui_metadata["agent_status"].values()),
+            "processing_complete": all(ui_metadata["agent_status"].values())
+        }
+        
+        return ui_metadata
     
     def _save_to_disk(self, data: Dict[str, Any]) -> Dict[str, str]:
         """Save processed data to disk in organized structure."""
@@ -296,17 +509,18 @@ class ScriptIngestionCoordinator:
             timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
             paths = {}
             
-            # Save main data
+            # Save main data with agent outputs
             main_path = f"data/scripts/script_{timestamp}.json"
             with open(main_path, "w") as f:
                 json.dump({
                     "parsed_data": data["parsed_data"],
                     "processing_status": data["processing_status"],
-                    "statistics": data["statistics"]
+                    "statistics": data["statistics"],
+                    "agent_outputs": data["agent_outputs"]
                 }, f, indent=2)
             paths["main"] = main_path
             
-            # Save metadata
+            # Save integrated metadata
             metadata_path = f"data/scripts/metadata/metadata_{timestamp}.json"
             with open(metadata_path, "w") as f:
                 json.dump({
@@ -315,11 +529,12 @@ class ScriptIngestionCoordinator:
                 }, f, indent=2)
             paths["metadata"] = metadata_path
             
-            # Save validation
-            validation_path = f"data/scripts/validation/validation_{timestamp}.json"
-            with open(validation_path, "w") as f:
-                json.dump(data["validation"], f, indent=2)
-            paths["validation"] = validation_path
+            # Save individual agent outputs
+            agents_path = f"data/scripts/agents/agents_{timestamp}.json"
+            os.makedirs("data/scripts/agents", exist_ok=True)
+            with open(agents_path, "w") as f:
+                json.dump(data["agent_outputs"], f, indent=2)
+            paths["agents"] = agents_path
             
             logger.info(f"Data saved successfully to {len(paths)} files")
             return paths
@@ -327,21 +542,3 @@ class ScriptIngestionCoordinator:
         except Exception as e:
             logger.error(f"Failed to save data to disk: {str(e)}")
             raise
-    
-    def _format_validation_errors(self, critical_issues: List[Dict[str, Any]]) -> str:
-        """Format critical validation issues into a readable error message."""
-        error_msg = ["Critical validation issues found:"]
-        
-        for issue in critical_issues:
-            scene = issue.get("scene_number", "N/A")
-            category = issue.get("category", "Unknown")
-            description = issue.get("description", "No description")
-            suggestion = issue.get("suggestion", "No suggestion provided")
-            
-            error_msg.extend([
-                f"\nScene {scene} - {category}:",
-                f"  Issue: {description}",
-                f"  Suggestion: {suggestion}"
-            ])
-        
-        return "\n".join(error_msg) 

@@ -24,7 +24,7 @@ logger = logging.getLogger(__name__)
 # Configure Google Gen AI client
 client = genai.Client(api_key=os.getenv("GOOGLE_API_KEY"))
 
-def call_gemini_25_flash(
+async def call_gemini_25_flash(
     prompt: str,
     model: str = "gemini-2.5-flash",
     temperature: float = 0.7,
@@ -124,7 +124,7 @@ def call_gemini_25_flash(
             }
         )
 
-def call_gemini_with_system_message(
+async def call_gemini_with_system_message(
     prompt: str,
     system_message: str = "You are a helpful assistant.",
     temperature: float = 0.7,
