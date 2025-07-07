@@ -4,8 +4,16 @@ Script Ingestion Agents
 Specialized agents for parsing, validating, and extracting metadata from scripts.
 """
 
-from .parser_agent import ScriptParserAgent
-from .metadata_agent import MetadataAgent
-from .validator_agent import ValidatorAgent
+from .script_parser_agent import ScriptParserAgent
+from .eighths_calculator_agent import EighthsCalculatorAgent
+from .breakdown_specialist_agent import BreakdownSpecialistAgent
+from .department_coordinator_agent import DepartmentCoordinatorAgent
+from .production_analyzer_agent import ProductionAnalyzerAgent
 
-__all__ = ['ScriptParserAgent', 'MetadataAgent', 'ValidatorAgent'] 
+__all__ = [
+    'ScriptParserAgent',
+    'EighthsCalculatorAgent', 
+    'BreakdownSpecialistAgent',
+    'DepartmentCoordinatorAgent',
+    'ProductionAnalyzerAgent'
+] 
