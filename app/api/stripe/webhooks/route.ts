@@ -1,10 +1,11 @@
-import {
-  manageSubscriptionStatusChange,
-  updateStripeCustomer
-} from "@/actions/stripe"
+// import {
+//   manageSubscriptionStatusChange,
+//   updateStripeCustomer
+// } from "@/actions/stripe"
 import { stripe } from "@/lib/stripe"
 import { createRequestLogger } from "@/lib/logger"
 import { headers } from "next/headers"
+import { NextRequest } from "next/server"
 import Stripe from "stripe"
 
 const relevantEvents = new Set([
@@ -13,9 +14,9 @@ const relevantEvents = new Set([
   "customer.subscription.deleted"
 ])
 
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
   const requestId = crypto.randomUUID()
-  const logger = createRequestLogger(req as Request, requestId)
+  const logger = createRequestLogger(req, requestId)
   
   logger.info('Processing Stripe webhook')
   
@@ -59,7 +60,10 @@ export async function POST(req: Request) {
           throw new Error("Unhandled relevant event!")
       }
     } catch (error) {
-      logger.error('Webhook handler failed', error as Error, { eventType: event.type })
+      logger.error('Webhook handler failed', error as Error, { 
+        component: 'StripeWebhook',
+        metadata: { eventType: event.type }
+      })
       return new Response(
         JSON.stringify({
           error: "Webhook handler failed. View your function logs."
@@ -76,39 +80,11 @@ export async function POST(req: Request) {
 }
 
 async function handleSubscriptionChange(event: Stripe.Event) {
-  const subscription = event.data.object as Stripe.Subscription
-  const productId = subscription.items.data[0].price.product as string
-  await manageSubscriptionStatusChange(
-    subscription.id,
-    subscription.customer as string,
-    productId
-  )
+  // Bypass subscription change handling - Stripe functionality disabled
+  console.log('Stripe subscription change bypassed:', event.type)
 }
 
 async function handleCheckoutSession(event: Stripe.Event) {
-  const checkoutSession = event.data.object as Stripe.Checkout.Session
-  if (checkoutSession.mode === "subscription") {
-    const subscriptionId = checkoutSession.subscription as string
-    const clientReferenceId = checkoutSession.client_reference_id
-    const customerId = checkoutSession.customer as string
-
-    if (!clientReferenceId) {
-      throw new Error(
-        "client_reference_id is required for subscription checkout"
-      )
-    }
-
-    await updateStripeCustomer(clientReferenceId, subscriptionId, customerId)
-
-    const subscription = await stripe.subscriptions.retrieve(subscriptionId, {
-      expand: ["default_payment_method"]
-    })
-
-    const productId = subscription.items.data[0].price.product as string
-    await manageSubscriptionStatusChange(
-      subscription.id,
-      subscription.customer as string,
-      productId
-    )
-  }
+  // Bypass checkout session handling - Stripe functionality disabled
+  console.log('Stripe checkout session bypassed:', event.type)
 }

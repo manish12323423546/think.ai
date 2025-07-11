@@ -6,7 +6,7 @@ import { Badge } from '@/components/ui/badge'
 import { Progress } from '@/components/ui/progress'
 import { Clock, Users, MapPin, AlertTriangle, CheckCircle } from 'lucide-react'
 
-interface BreakdownCard {
+export interface BreakdownCard {
   scene_number: string
   location: string
   location_type: string

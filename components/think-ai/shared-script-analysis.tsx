@@ -541,7 +541,7 @@ export function SharedScriptAnalysis({ allowedRoles, requiredPermission }: Share
   }
 
   return (
-    <RoleGate roles={allowedRoles}>
+    <RoleGate allowedRoles={allowedRoles}>
       <div className="h-full overflow-y-auto p-6 space-y-8">
         {/* Header */}
         <div className="space-y-2">

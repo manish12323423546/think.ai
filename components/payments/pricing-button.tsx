@@ -1,6 +1,6 @@
 "use client"
 
-import { createCheckoutUrl } from "@/actions/stripe"
+// import { createCheckoutUrl } from "@/actions/stripe"
 import { Button } from "@/components/ui/button"
 import { useAuth } from "@clerk/nextjs"
 import { useRouter } from "next/navigation"
@@ -26,39 +26,9 @@ export function PricingButton({
   const [isLoading, setIsLoading] = useState(false)
 
   const handleClick = async () => {
-    if (!isSignedIn) {
-      // Store the payment link for post-auth redirect
-      sessionStorage.setItem("pendingCheckout", paymentLink)
-      toast.info("Please sign in to continue")
-      router.push("/login")
-      return
-    }
-
-    setIsLoading(true)
-    try {
-      const result = await createCheckoutUrl(paymentLink)
-
-      if (result.error) {
-        throw new Error(result.error)
-      }
-
-      if (result.url) {
-        window.location.href = result.url
-      } else {
-        throw new Error("No checkout URL received")
-      }
-    } catch (error) {
-      const logger = createComponentLogger('PricingButton')
-      logger.error('Checkout initiation failed', error instanceof Error ? error : undefined, {
-        action: 'handleCheckout',
-        metadata: { paymentLink }
-      })
-      toast.error(
-        error instanceof Error ? error.message : "Failed to start checkout"
-      )
-    } finally {
-      setIsLoading(false)
-    }
+    // Bypass payment functionality - Stripe disabled
+    toast.info("Payment functionality is currently disabled")
+    console.log('Payment bypassed for:', paymentLink)
   }
 
   return (

@@ -283,7 +283,7 @@ export function SharedCharacterBreakdown({ allowedRoles, requiredPermission, rea
   const characterNames = Object.keys(characters)
 
   return (
-    <RoleGate roles={allowedRoles}>
+    <RoleGate allowedRoles={allowedRoles}>
       <div className="h-full overflow-y-auto p-6 space-y-8">
         {/* Header */}
         <div className="space-y-2">

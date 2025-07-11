@@ -33,7 +33,7 @@ export async function getCurrentUserRole(): Promise<Roles | null> {
     return role as Roles || null
   } catch (error) {
     const logger = createComponentLogger('roles-server')
-    logger.error('Failed to get current user role', error)
+    logger.error('Failed to get current user role', error instanceof Error ? error : new Error('Unknown error'))
     return null
   }
 }
@@ -59,7 +59,10 @@ export async function setUserRole(userId: string, role: Roles) {
     return { success: true }
   } catch (error) {
     const logger = createComponentLogger('roles-server')
-    logger.error('Failed to set user role', error, { userId, role })
+    logger.error('Failed to set user role', error instanceof Error ? error : new Error('Unknown error'), { 
+      component: 'roles-server',
+      metadata: { userId, role }
+    })
     return { success: false, error: 'Failed to set user role' }
   }
 }

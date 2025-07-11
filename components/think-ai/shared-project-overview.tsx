@@ -131,7 +131,7 @@ export function SharedProjectOverview({ allowedRoles, requiredPermission, viewMo
 
   if (!scriptData) {
     return (
-      <RoleGate roles={allowedRoles}>
+      <RoleGate allowedRoles={allowedRoles}>
         <div className="h-full overflow-y-auto p-6">
           <Card>
             <CardContent className="flex flex-col items-center justify-center h-64 text-center">
@@ -151,7 +151,7 @@ export function SharedProjectOverview({ allowedRoles, requiredPermission, viewMo
   }
 
   return (
-    <RoleGate roles={allowedRoles}>
+    <RoleGate allowedRoles={allowedRoles}>
       <div className="h-full overflow-y-auto p-6 space-y-8">
         {/* Header */}
         <div className="space-y-2">

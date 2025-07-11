@@ -266,7 +266,7 @@ export default function CharacterBreakdownPage() {
           {/* Character Subtabs Content */}
           {activeSubtab === 0 && (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {Object.entries(characterData.characters).map(([name, character]) => (
+              {Object.entries(characterData?.characters || {}).map(([name, character]) => (
                 <Card key={name} className="border border-border/40">
                   <CardHeader>
                     <div className="flex items-center mb-4">
@@ -276,34 +276,17 @@ export default function CharacterBreakdownPage() {
                       <div className="ml-3">
                         <h4 className="font-medium text-lg">{name}</h4>
                         <p className="text-sm text-muted-foreground">
-                          Primary emotion: <span className="font-medium">{character.emotional_range?.primary_emotion || 'N/A'}</span>
+                          {character.objective || 'No objective defined'}
                         </p>
                       </div>
                     </div>
                   </CardHeader>
                   <CardContent className="space-y-4">
-                    {/* Dialogue Analysis */}
+                    {/* Character Arc */}
                     <div>
-                      <h5 className="text-sm font-medium mb-2">Dialogue Analysis</h5>
-                      <div className="bg-muted/30 p-3 rounded-lg space-y-2">
-                        <div className="grid grid-cols-2 gap-4 text-sm">
-                          <div className="flex justify-between">
-                            <span className="text-muted-foreground">Lines:</span>
-                            <span>{character.dialogue_analysis?.total_lines || 0}</span>
-                          </div>
-                          <div className="flex justify-between">
-                            <span className="text-muted-foreground">Words:</span>
-                            <span>{character.dialogue_analysis?.total_words || 0}</span>
-                          </div>
-                          <div className="flex justify-between">
-                            <span className="text-muted-foreground">Avg Length:</span>
-                            <span>{character.dialogue_analysis?.average_line_length?.toFixed(1) || '0'}</span>
-                          </div>
-                          <div className="flex justify-between">
-                            <span className="text-muted-foreground">Complexity:</span>
-                            <span>{character.dialogue_analysis?.vocabulary_complexity?.toFixed(1) || '0'}</span>
-                          </div>
-                        </div>
+                      <h5 className="text-sm font-medium mb-2">Character Arc</h5>
+                      <div className="bg-muted/30 p-3 rounded-lg">
+                        <p className="text-sm">{character.arc || 'No arc defined'}</p>
                       </div>
                     </div>
 
@@ -311,7 +294,7 @@ export default function CharacterBreakdownPage() {
                     <div>
                       <h5 className="text-sm font-medium mb-2">Scene Presence</h5>
                       <div className="flex flex-wrap gap-1">
-                        {(character.scene_presence || []).map((scene, index) => (
+                        {(character.scenes || []).map((scene, index) => (
                           <Badge key={index} variant="secondary" className="text-xs">
                             Scene {scene}
                           </Badge>
@@ -319,15 +302,15 @@ export default function CharacterBreakdownPage() {
                       </div>
                     </div>
 
-                    {/* Props */}
+                    {/* Relationships */}
                     <div>
-                      <h5 className="text-sm font-medium mb-2">Props</h5>
+                      <h5 className="text-sm font-medium mb-2">Relationships</h5>
                       <div className="bg-muted/30 p-3 rounded-lg">
-                        <div className="flex flex-wrap gap-1">
-                          {(character.props?.base || []).map((prop, index) => (
-                            <span key={index} className="bg-muted/50 px-2 py-0.5 rounded text-sm">
-                              {prop}
-                            </span>
+                        <div className="space-y-2">
+                          {(character.relationships || []).map((rel, index) => (
+                            <div key={index} className="text-sm">
+                              <span className="font-medium">{rel.character}:</span> {rel.relationship}
+                            </div>
                           ))}
                         </div>
                       </div>
@@ -343,78 +326,30 @@ export default function CharacterBreakdownPage() {
               <h3 className="text-xl font-medium">Character Arcs & Relationships</h3>
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {Object.entries(characterData.characters).map(([charName, char]) => {
-                  const emotionalJourney = char.emotional_range?.emotional_journey || [];
-                  
+                {Object.entries(characterData?.characters || {}).map(([charName, char]) => {
                   return (
                     <Card key={charName} className="border border-border/40">
                       <CardHeader>
-                        <CardTitle>{charName}'s Emotional Journey</CardTitle>
+                        <CardTitle>{charName}'s Character Arc</CardTitle>
                       </CardHeader>
                       <CardContent>
-                        {emotionalJourney.length > 0 ? (
-                          <div className="space-y-3">
-                            {emotionalJourney.map((journey, i) => (
-                              <div key={i} className="bg-muted/30 p-3 rounded">
-                                <div className="flex justify-between mb-1">
-                                  <span className="text-muted-foreground">Scene {journey.scene}</span>
-                                  <span className="text-xs px-2 py-0.5 bg-blue-100 text-blue-700 rounded">
-                                    Intensity: {(journey.intensity * 10).toFixed(0)}/10
-                                  </span>
-                                </div>
-                                <div className="text-sm mb-1">
-                                  <span className="text-muted-foreground mr-2">Emotion:</span>
-                                  <span className="font-medium">{journey.emotion}</span>
-                                </div>
-                                <div className="text-xs text-muted-foreground">
-                                  Trigger: {journey.trigger}
-                                </div>
-                              </div>
-                            ))}
-                          </div>
-                        ) : (
-                          <div className="text-center text-muted-foreground p-4">
-                            No emotional journey data available
-                          </div>
-                        )}
-                      </CardContent>
-                    </Card>
-                  );
-                })}
-              </div>
-
-              <h4 className="text-lg font-medium">Character Relationships</h4>
-              <div className="space-y-4">
-                {Object.entries(characterData.relationships || {}).map(([relationKey, relation]) => {
-                  const charNames = relationKey.split('-');
-                  return (
-                    <Card key={relationKey} className="border border-border/40">
-                      <CardHeader>
-                        <CardTitle>
-                          <span className="text-blue-600">{charNames[0]}</span> & <span className="text-blue-600">{charNames[1]}</span>
-                        </CardTitle>
-                      </CardHeader>
-                      <CardContent>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="space-y-4">
                           <div>
-                            <div className="text-sm text-muted-foreground mb-1">Relationship Type:</div>
-                            <div className="text-sm bg-muted/30 p-2 rounded">
-                              {relation.type || 'Not specified'}
-                            </div>
+                            <h5 className="text-sm font-medium mb-2">Objective</h5>
+                            <p className="text-sm text-muted-foreground">{char.objective || 'No objective defined'}</p>
                           </div>
-                          
                           <div>
-                            <div className="text-sm text-muted-foreground mb-1">Dynamics:</div>
-                            <div className="flex flex-wrap gap-1">
-                              {relation.dynamics && relation.dynamics.length > 0 ? (
-                                relation.dynamics.map((dynamic, i) => (
-                                  <span key={i} className="text-xs bg-muted/20 px-2 py-1 rounded">
-                                    {dynamic}
-                                  </span>
-                                ))
-                              ) : (
-                                <span className="text-sm text-muted-foreground">No dynamics defined</span>
-                              )}
+                            <h5 className="text-sm font-medium mb-2">Character Arc</h5>
+                            <p className="text-sm text-muted-foreground">{char.arc || 'No arc defined'}</p>
+                          </div>
+                          <div>
+                            <h5 className="text-sm font-medium mb-2">Key Relationships</h5>
+                            <div className="space-y-2">
+                              {char.relationships?.map((rel, idx) => (
+                                <div key={idx} className="text-sm">
+                                  <span className="font-medium">{rel.character}:</span> {rel.relationship}
+                                </div>
+                              )) || <p className="text-sm text-muted-foreground">No relationships defined</p>}
                             </div>
                           </div>
                         </div>
@@ -423,6 +358,7 @@ export default function CharacterBreakdownPage() {
                   );
                 })}
               </div>
+
             </div>
           )}
 
@@ -430,14 +366,14 @@ export default function CharacterBreakdownPage() {
             <div className="space-y-6">
               <h3 className="text-xl font-medium">Scene Matrix</h3>
               
-              {characterData.scene_matrix && Object.keys(characterData.scene_matrix).length > 0 ? (
+              {false ? (
                 <div className="space-y-6">
                   <div className="overflow-x-auto">
                     <table className="w-full border-collapse">
                       <thead>
                         <tr className="border-b border-border">
                           <th className="p-3 text-left text-muted-foreground font-medium">Scene</th>
-                          {Object.keys(characterData.characters).map(char => (
+                          {Object.keys(characterData?.characters || {}).map(char => (
                             <th key={char} className="p-3 text-left text-muted-foreground font-medium">
                               {char}
                             </th>
@@ -446,14 +382,14 @@ export default function CharacterBreakdownPage() {
                         </tr>
                       </thead>
                       <tbody>
-                        {Object.entries(characterData.scene_matrix).map(([sceneId, sceneData]) => {
+                        {Object.entries({}).map(([sceneId, sceneData]) => {
                           const scene = sceneData as { characters?: string[], present_characters?: string[], emotional_tone?: string };
                           const characters = scene.characters || scene.present_characters || [];
                           
                           return (
                             <tr key={sceneId} className="border-b border-border/30">
                               <td className="p-3 font-medium">{sceneId}</td>
-                              {Object.keys(characterData.characters).map(char => (
+                              {Object.keys(characterData?.characters || {}).map(char => (
                                 <td key={`${sceneId}-${char}`} className="p-3">
                                   {characters.includes(char) ? (
                                     <span className="inline-block w-4 h-4 rounded-full bg-green-500"></span>
@@ -464,7 +400,7 @@ export default function CharacterBreakdownPage() {
                               ))}
                               <td className="p-3 text-sm">
                                 <span className="bg-muted/30 px-2 py-1 rounded">
-                                  {scene.emotional_tone || scene.emotional_atmosphere || 'Not specified'}
+                                  {'Not specified'}
                                 </span>
                               </td>
                             </tr>
@@ -488,26 +424,22 @@ export default function CharacterBreakdownPage() {
 
           {activeSubtab === 3 && (
             <div className="space-y-6">
-              <h3 className="text-xl font-medium">Character Statistics</h3>
+              <h3 className="text-xl font-medium">Character Summary</h3>
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <Card className="border border-border/40">
                   <CardHeader>
-                    <CardTitle>Scene Statistics</CardTitle>
+                    <CardTitle>Character Overview</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-2">
                       <div className="flex justify-between">
-                        <span className="text-muted-foreground">Total Scenes:</span>
-                        <span>{characterData.statistics?.scene_stats?.total_scenes || 0}</span>
+                        <span className="text-muted-foreground">Total Characters:</span>
+                        <span>{Object.keys(characterData?.characters || {}).length}</span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-muted-foreground">Characters Per Scene (avg):</span>
-                        <span>{(characterData.statistics?.scene_stats?.average_characters_per_scene || 0).toFixed(1)}</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-muted-foreground">Total Interactions:</span>
-                        <span>{characterData.statistics?.scene_stats?.total_interactions || 0}</span>
+                        <span className="text-muted-foreground">Main Characters:</span>
+                        <span>{Object.keys(characterData?.characters || {}).slice(0, 3).join(', ')}</span>
                       </div>
                     </div>
                   </CardContent>
@@ -515,31 +447,18 @@ export default function CharacterBreakdownPage() {
                 
                 <Card className="border border-border/40">
                   <CardHeader>
-                    <CardTitle>Dialogue Statistics</CardTitle>
+                    <CardTitle>Character Details</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-3">
-                      {Object.entries(characterData.statistics?.dialogue_stats || {}).map(([charName, statData]) => {
-                        const dialogueStats = statData as { total_lines?: number, total_words?: number };
-                        return (
-                          <div key={charName} className="text-sm">
-                            <div className="flex justify-between font-medium">
-                              <span>{charName}</span>
-                              <span>{dialogueStats.total_lines || 0} lines / {dialogueStats.total_words || 0} words</span>
-                            </div>
-                            <div className="grid grid-cols-2 gap-2 mt-1 text-xs">
-                              <div>
-                                <span className="text-muted-foreground">Avg Line Length: </span>
-                                <span>{dialogueStats.average_line_length?.toFixed(1) || '0'} words</span>
-                              </div>
-                              <div>
-                                <span className="text-muted-foreground">Vocabulary Complexity: </span>
-                                <span>{dialogueStats.vocabulary_complexity?.toFixed(1) || '0'}/5</span>
-                              </div>
-                            </div>
+                      {Object.entries(characterData?.characters || {}).slice(0, 5).map(([charName, char]) => (
+                        <div key={charName} className="text-sm">
+                          <div className="font-medium">{charName}</div>
+                          <div className="text-xs text-muted-foreground">
+                            Appears in {char.scenes?.length || 0} scenes
                           </div>
-                        );
-                      })}
+                        </div>
+                      ))}
                     </div>
                   </CardContent>
                 </Card>

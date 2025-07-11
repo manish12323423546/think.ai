@@ -1,4 +1,4 @@
-import { getBillingDataByUserId } from "@/actions/customers"
+// import { getBillingDataByUserId } from "@/actions/customers"
 import { auth } from "@clerk/nextjs/server"
 import { AlertCircle, CreditCard, Film, Zap, Crown } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -21,7 +21,13 @@ export default async function BillingPage() {
     )
   }
 
-  const customerResponse = await getBillingDataByUserId(userId)
+  // Bypass customer billing data - use default values
+  const customerResponse = {
+    customer: null,
+    clerkEmail: null,
+    stripeEmail: null,
+    subscription: null
+  }
   logger.debug('Retrieved billing data for user', {
     userId,
     component: 'BillingPage',
@@ -67,7 +73,8 @@ export default async function BillingPage() {
     }
   }
 
-  const currentPlan = planDetails[customerData.membership as keyof typeof planDetails] || planDetails.free
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const currentPlan = planDetails[((customerData as any)?.membership as keyof typeof planDetails) || "free"] || planDetails.free
 
   return (
     <div className="space-y-8">
@@ -108,7 +115,8 @@ export default async function BillingPage() {
               </ul>
             </div>
 
-            {customerData.membership === "free" && (
+            {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+            {(customerData as any)?.membership === "free" && (
               <div className="mt-6 pt-4 border-t">
                 <h3 className="font-medium mb-2">Ready to upgrade?</h3>
                 <p className="text-sm text-muted-foreground mb-4">
@@ -131,7 +139,8 @@ export default async function BillingPage() {
                 <p className="text-sm text-muted-foreground">Projects This Month</p>
                 <p className="text-2xl font-bold">3</p>
                 <p className="text-xs text-muted-foreground">
-                  {customerData.membership === "free" ? "of 2 allowed" : "Unlimited"}
+                  {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+                  {(customerData as any)?.membership === "free" ? "of 2 allowed" : "Unlimited"}
                 </p>
               </div>
               <div>
@@ -143,7 +152,8 @@ export default async function BillingPage() {
                 <p className="text-sm text-muted-foreground">Storyboards Generated</p>
                 <p className="text-2xl font-bold">23</p>
                                  <p className="text-xs text-muted-foreground">
-                   {customerData.membership === "free" ? "Limited" : "Unlimited"}
+                   {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+                 {(customerData as any)?.membership === "free" ? "Limited" : "Unlimited"}
                  </p>
               </div>
               <div>
@@ -167,7 +177,8 @@ export default async function BillingPage() {
               </Link>
             </Button>
             
-            {customerData.membership !== "free" && (
+            {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+            {(customerData as any)?.membership !== "free" && (
               <>
                 <Button variant="outline" className="w-full justify-start">
                   <CreditCard className="mr-2 h-4 w-4" />

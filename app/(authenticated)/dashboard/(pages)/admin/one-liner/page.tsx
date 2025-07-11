@@ -237,7 +237,7 @@ export default function OneLinerPage() {
             </CardHeader>
             <CardContent>
               <p className="text-muted-foreground">
-                {oneLinerData.overall_summary || 'No overall summary available'}
+                Scene breakdown generated with {oneLinerData.scenes?.length || 0} scenes
               </p>
             </CardContent>
           </Card>
@@ -247,10 +247,10 @@ export default function OneLinerPage() {
             <h3 className="text-lg font-medium">Scene Breakdowns</h3>
             <div className="space-y-4">
               {oneLinerData.scenes?.map((scene) => (
-                <Card key={scene.scene_number || scene.scene_id} className="border border-border/50">
+                <Card key={scene.scene_number} className="border border-border/50">
                   <CardContent className="p-4">
                     <div className="flex justify-between items-start mb-2">
-                      <h4 className="font-medium">Scene {scene.scene_number || scene.scene_id}</h4>
+                      <h4 className="font-medium">Scene {scene.scene_number}</h4>
                     </div>
                     <p className="text-muted-foreground mb-2">
                       {scene.one_liner}

@@ -384,11 +384,12 @@ export function SharedOneLiner({ allowedRoles, requiredPermission }: SharedOneLi
             </CardHeader>
             <CardContent className="space-y-4">
               {(() => {
-                const storyData = oneLinerData.agent_results.story_analyzer.data
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                const storyData = oneLinerData.agent_results.story_analyzer.data as any
                 return (
                   <div className="space-y-4">
                     {/* Story Elements */}
-                    {storyData.story_elements && (
+                    {storyData?.story_elements && (
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                           <h4 className="font-medium mb-2">Story Elements</h4>
@@ -453,11 +454,12 @@ export function SharedOneLiner({ allowedRoles, requiredPermission }: SharedOneLi
             </CardHeader>
             <CardContent className="space-y-4">
               {(() => {
-                const pitchData = oneLinerData.agent_results.pitch_specialist.data
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                const pitchData = oneLinerData.agent_results.pitch_specialist.data as any
                 return (
                   <div className="space-y-4">
                     {/* Loglines */}
-                    {pitchData.loglines && (
+                    {pitchData?.loglines && (
                       <div>
                         <h4 className="font-medium mb-2">Professional Loglines</h4>
                         <div className="space-y-2">
@@ -546,11 +548,12 @@ export function SharedOneLiner({ allowedRoles, requiredPermission }: SharedOneLi
             </CardHeader>
             <CardContent className="space-y-4">
               {(() => {
-                const marketingData = oneLinerData.agent_results.marketing_strategist.data
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                const marketingData = oneLinerData.agent_results.marketing_strategist.data as any
                 return (
                   <div className="space-y-4">
                     {/* Campaign Strategy */}
-                    {marketingData.campaign_strategy && (
+                    {marketingData?.campaign_strategy && (
                       <div>
                         <h4 className="font-medium mb-2">Campaign Strategy</h4>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
@@ -600,11 +603,12 @@ export function SharedOneLiner({ allowedRoles, requiredPermission }: SharedOneLi
             </CardHeader>
             <CardContent className="space-y-4">
               {(() => {
-                const genreData = oneLinerData.agent_results.genre_classifier.data
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                const genreData = oneLinerData.agent_results.genre_classifier.data as any
                 return (
                   <div className="space-y-4">
                     {/* Genre Classification */}
-                    {genreData.genre_classification && (
+                    {genreData?.genre_classification && (
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                           <h4 className="font-medium mb-2">Genre Classification</h4>
@@ -665,11 +669,12 @@ export function SharedOneLiner({ allowedRoles, requiredPermission }: SharedOneLi
             </CardHeader>
             <CardContent className="space-y-4">
               {(() => {
-                const audienceData = oneLinerData.agent_results.audience_targeting.data
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                const audienceData = oneLinerData.agent_results.audience_targeting.data as any
                 return (
                   <div className="space-y-4">
                     {/* Primary Demographics */}
-                    {audienceData.target_demographics?.primary && (
+                    {audienceData?.target_demographics?.primary && (
                       <div>
                         <h4 className="font-medium mb-2">Primary Demographics</h4>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">

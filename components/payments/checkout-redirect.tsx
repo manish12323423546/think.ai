@@ -1,6 +1,6 @@
 "use client"
 
-import { createCheckoutUrl } from "@/actions/stripe"
+// import { createCheckoutUrl } from "@/actions/stripe"
 import { useAuth } from "@clerk/nextjs"
 import { useEffect, useState } from "react"
 import { toast } from "sonner"
@@ -23,25 +23,9 @@ export function CheckoutRedirect() {
       // Clear the pending checkout immediately to prevent loops
       sessionStorage.removeItem("pendingCheckout")
 
-      try {
-        const result = await createCheckoutUrl(pendingCheckout)
-
-        if (result.error) {
-          toast.error(result.error)
-          return
-        }
-
-        if (result.url) {
-          // Redirect to Stripe checkout
-          window.location.href = result.url
-        }
-      } catch (error) {
-        const logger = createComponentLogger('CheckoutRedirect')
-        logger.error('Checkout redirect failed', error instanceof Error ? error : undefined, {
-          action: 'handlePendingCheckout'
-        })
-        toast.error("Failed to redirect to checkout")
-      }
+      // Bypass checkout functionality - Stripe disabled
+      toast.info("Checkout functionality is currently disabled")
+      console.log('Checkout redirect bypassed for:', pendingCheckout)
     }
 
     handlePendingCheckout()

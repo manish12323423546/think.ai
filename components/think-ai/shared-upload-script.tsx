@@ -349,7 +349,7 @@ export function SharedUploadScript({ allowedRoles, requiredPermission }: SharedU
     !isLoading && ((uploadMode === 'file' && file) || (uploadMode === 'text' && scriptText.trim() !== ''))
 
   return (
-    <RoleGate roles={allowedRoles}>
+    <RoleGate allowedRoles={allowedRoles}>
       <div className="h-full overflow-y-auto p-6 space-y-8">
         {/* Show offline warning */}
         {isOffline && (

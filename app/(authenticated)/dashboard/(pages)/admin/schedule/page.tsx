@@ -213,11 +213,7 @@ export default function SchedulePage() {
             <CardHeader>
               <CardTitle>Schedule Summary</CardTitle>
               <CardDescription>
-                {scheduleData.summary ? (
-                  `${scheduleData.summary.total_days} days, ${scheduleData.summary.total_scenes} scenes, ${scheduleData.summary.total_pages} pages`
-                ) : (
-                  `${scheduleData.schedule?.length || 0} days scheduled`
-                )}
+                {`${scheduleData.schedule?.length || 0} days scheduled`}
               </CardDescription>
             </CardHeader>
           </Card>
@@ -241,19 +237,19 @@ export default function SchedulePage() {
                         <div className="flex justify-between items-start">
                           <div>
                             <h4 className="font-medium">
-                              Scene {scene.scene_id || scene.scene_number || index + 1}
+                              Scene {scene.scene_number}
                             </h4>
                             <p className="text-sm text-muted-foreground">
-                              {scene.location_id || scene.location || 'Unknown location'}
+                              {scene.location || 'Unknown location'}
                             </p>
                             <div className="text-xs text-muted-foreground mt-1">
-                              {scene.start_time} - {scene.end_time}
+                              {scene.time || 'Time TBD'}
                             </div>
                           </div>
                           <div className="text-right text-sm">
                             <div className="flex items-center gap-1 text-muted-foreground">
                               <Clock className="h-3 w-3" />
-                              {scene.duration_minutes ? `${scene.duration_minutes}min` : 'Duration TBD'}
+                              {`Setup: ${scene.setup_time}min, Shoot: ${scene.shoot_time}min`}
                             </div>
                             {scene.setup_time && (
                               <div className="text-xs text-muted-foreground mt-1">
@@ -262,13 +258,6 @@ export default function SchedulePage() {
                             )}
                           </div>
                         </div>
-                        {scene.crew_ids && scene.crew_ids.length > 0 && (
-                          <div className="mt-2 pt-2 border-t">
-                            <div className="text-xs text-muted-foreground">
-                              Crew: {scene.crew_ids.length} members assigned
-                            </div>
-                          </div>
-                        )}
                       </CardContent>
                     </Card>
                   )) || (

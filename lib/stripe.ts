@@ -7,7 +7,7 @@ if (!stripeSecretKey) {
 }
 
 export const stripe = new Stripe(stripeSecretKey, {
-  apiVersion: "2025-05-28.basil",
+  apiVersion: "2025-06-30.basil",
   appInfo: {
     name: "Think AI",
     version: "1.0.0",

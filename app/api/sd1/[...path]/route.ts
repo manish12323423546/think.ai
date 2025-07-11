@@ -58,11 +58,13 @@ async function handleRequest(
     const url = `${SD1_API_URL}/api/${path}`
 
     // Log the request
-    logger.info('SD1 API proxy request', undefined, {
-      method,
-      path,
-      userId: user.id,
-      component: 'SD1Proxy'
+    logger.info('SD1 API proxy request', {
+      component: 'SD1Proxy',
+      metadata: {
+        method,
+        path,
+        userId: user.id
+      }
     })
 
     // Prepare headers
@@ -123,10 +125,12 @@ async function handleRequest(
     )
 
   } catch (error) {
-    logger.error('SD1 API proxy error', error instanceof Error ? error : undefined, {
-      method,
-      path: params.path.join('/'),
-      component: 'SD1Proxy'
+    logger.error('SD1 API proxy error', error instanceof Error ? error : new Error('Unknown error'), {
+      component: 'SD1Proxy',
+      metadata: {
+        method,
+        path: params.path.join('/')
+      }
     })
 
     return NextResponse.json(
