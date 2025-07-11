@@ -28,6 +28,16 @@ interface EighthsCalculatorReport {
     moderate: number
     complex: number
   }
+  scene_details?: Array<{
+    scene_number: string
+    location: string
+    scene_summary: string
+    characters_in_scene: string[]
+    adjusted_eighths: number
+    estimated_hours: number
+    complexity_level: string
+    shooting_notes: string[]
+  }>
 }
 
 interface TimingAnalysis {
@@ -242,6 +252,89 @@ export function Reports({ reports }: ReportsProps) {
                         className="h-3"
                       />
                     </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Scene Details - Enhanced */}
+              {eighths_calculator?.scene_details && eighths_calculator.scene_details.length > 0 && (
+                <div>
+                  <h4 className="text-lg font-semibold mb-4">Scene Details</h4>
+                  <div className="space-y-4 max-h-96 overflow-y-auto">
+                    {eighths_calculator.scene_details.map((scene, index) => (
+                      <div key={index} className="p-4 border rounded-lg bg-muted/30">
+                        {/* Scene Header */}
+                        <div className="flex items-center justify-between mb-3">
+                          <div className="flex items-center gap-2">
+                            <span className="font-semibold">Scene {scene.scene_number}</span>
+                            <Badge variant="outline" className="text-xs">
+                              {scene.location}
+                            </Badge>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Badge variant="outline" className="text-xs">
+                              {scene.adjusted_eighths} eighths
+                            </Badge>
+                            <Badge variant="outline" className="text-xs">
+                              {scene.estimated_hours}h
+                            </Badge>
+                          </div>
+                        </div>
+
+                        {/* Scene Summary */}
+                        <div className="mb-3">
+                          <h6 className="text-sm font-medium mb-1">Summary</h6>
+                          <p className="text-sm text-muted-foreground bg-gray-50 dark:bg-gray-900 p-2 rounded">
+                            {scene.scene_summary}
+                          </p>
+                        </div>
+
+                        {/* Characters */}
+                        {scene.characters_in_scene && scene.characters_in_scene.length > 0 && (
+                          <div className="mb-3">
+                            <h6 className="text-sm font-medium mb-1">Characters</h6>
+                            <div className="flex flex-wrap gap-1">
+                              {scene.characters_in_scene.map((character, charIndex) => (
+                                <Badge key={charIndex} variant="outline" className="text-xs bg-blue-50 dark:bg-blue-950/20">
+                                  <Users className="w-3 h-3 mr-1" />
+                                  {character}
+                                </Badge>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Shooting Notes */}
+                        {scene.shooting_notes && scene.shooting_notes.length > 0 && (
+                          <div className="mb-3">
+                            <h6 className="text-sm font-medium mb-1">Shooting Notes</h6>
+                            <div className="space-y-1">
+                              {scene.shooting_notes.map((note, noteIndex) => (
+                                <div key={noteIndex} className="text-xs bg-yellow-50 dark:bg-yellow-950/20 p-2 rounded border-l-2 border-yellow-400">
+                                  📝 {note}
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Scene Metrics */}
+                        <div className="grid grid-cols-3 gap-2 pt-2 border-t">
+                          <div className="text-center">
+                            <div className="text-sm font-medium">{scene.complexity_level}</div>
+                            <div className="text-xs text-muted-foreground">Complexity</div>
+                          </div>
+                          <div className="text-center">
+                            <div className="text-sm font-medium">{scene.adjusted_eighths}</div>
+                            <div className="text-xs text-muted-foreground">Adj. Eighths</div>
+                          </div>
+                          <div className="text-center">
+                            <div className="text-sm font-medium">{scene.estimated_hours}h</div>
+                            <div className="text-xs text-muted-foreground">Est. Hours</div>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
                   </div>
                 </div>
               )}

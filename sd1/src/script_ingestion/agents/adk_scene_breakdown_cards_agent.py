@@ -36,7 +36,7 @@ COMPLEXITY_CREW_MAPPING = {
 # Tool Functions using ADK patterns
 def analyze_scene_requirements_tool(scene_data: Dict[str, Any], tool_context: ToolContext) -> Dict[str, Any]:
     """
-    Analyze scene to identify production requirements.
+    Analyze scene to identify production requirements using enhanced scene data.
     
     Args:
         scene_data: Dictionary containing scene information
@@ -49,7 +49,11 @@ def analyze_scene_requirements_tool(scene_data: Dict[str, Any], tool_context: To
     logger.info(f"Analyzing requirements for scene {scene_number}")
     
     description = scene_data.get("description", "").upper()
+    scene_summary = scene_data.get("scene_summary", "").upper()
     technical_cues = scene_data.get("technical_cues", [])
+    characters_in_scene = scene_data.get("characters_in_scene", [])
+    location = scene_data.get("location", "").upper()
+    shooting_notes = scene_data.get("shooting_notes", [])
     
     requirements = {
         "cast": [],
@@ -59,38 +63,108 @@ def analyze_scene_requirements_tool(scene_data: Dict[str, Any], tool_context: To
         "special": []
     }
     
-    # Analyze description for keywords
-    if any(word in description for word in ["CAR", "VEHICLE", "DRIVING"]):
-        requirements["props"].append("Vehicle")
-        requirements["special"].append("Driving coordination")
+    # Enhanced cast requirements using extracted characters
+    if characters_in_scene:
+        for character in characters_in_scene:
+            requirements["cast"].append(f"{character} (speaking role)")
     
-    if any(word in description for word in ["FIGHT", "ACTION", "CHASE"]):
-        requirements["special"].append("Stunt coordination")
-        requirements["equipment"].append("Safety equipment")
+    # Enhanced location-based requirements
+    if "THRONE ROOM" in location:
+        requirements["props"].extend(["Throne", "Royal scepter", "Ceremonial banners"])
+        requirements["wardrobe"].extend(["Royal ceremonial costume", "Tribal leader garments"])
+        requirements["equipment"].extend(["Wide angle lens for establishing shot", "Multiple wireless mics"])
     
-    if any(word in description for word in ["WATER", "RAIN", "SNOW"]):
-        requirements["special"].append("Weather effects")
-        requirements["equipment"].append("Weather protection")
+    elif "WAKANDA" in location:
+        requirements["props"].extend(["Afrofuturistic technology", "Vibranium artifacts"])
+        requirements["wardrobe"].extend(["Wakandan traditional dress", "Advanced technology accessories"])
+        requirements["equipment"].append("LED lighting for technology glow effects")
+        requirements["special"].append("Wakandan culture consultant")
     
-    # Analyze technical cues
+    elif "LABORATORY" in location or "LAB" in location:
+        requirements["props"].extend(["Scientific equipment", "Computer terminals", "Lab specimens"])
+        requirements["wardrobe"].extend(["Lab coats", "Safety goggles"])
+        requirements["equipment"].extend(["Macro lenses for detail shots", "LED panels for sterile lighting"])
+    
+    elif "AIRCRAFT" in location or "PLANE" in location:
+        requirements["props"].extend(["Aircraft controls", "Safety equipment"])
+        requirements["wardrobe"].extend(["Flight suits", "Pilot helmets"])
+        requirements["equipment"].extend(["Green screen/LED wall for exterior views", "Gimbal for aircraft movement"])
+        requirements["special"].append("Aviation technical advisor")
+    
+    elif "FOREST" in location or "JUNGLE" in location:
+        requirements["props"].extend(["Jungle foliage", "Wildlife sound effects"])
+        requirements["wardrobe"].extend(["Outdoor/survival gear", "Camouflage"])
+        requirements["equipment"].extend(["Weather protection for cameras", "Portable power for remote location"])
+        requirements["special"].extend(["Wildlife wrangler", "Location safety coordinator"])
+    
+    # Enhanced content analysis using scene summary
+    content_to_analyze = f"{description} {scene_summary}"
+    
+    # Vehicle/transportation requirements
+    if any(word in content_to_analyze for word in ["CAR", "VEHICLE", "DRIVING", "MOTORCYCLE", "TRUCK"]):
+        requirements["props"].append("Hero vehicle")
+        requirements["special"].extend(["Stunt driver", "Transportation coordinator"])
+        requirements["equipment"].append("Car-mounted camera rigs")
+    
+    # Action/combat requirements
+    if any(word in content_to_analyze for word in ["FIGHT", "ACTION", "CHASE", "BATTLE", "COMBAT"]):
+        requirements["special"].extend(["Stunt coordinator", "Safety coordinator", "Medic on set"])
+        requirements["equipment"].extend(["Safety equipment", "Protective padding"])
+        requirements["props"].append("Stunt weapons/props")
+    
+    # Weather/environmental effects
+    if any(word in content_to_analyze for word in ["WATER", "RAIN", "SNOW", "WIND", "STORM"]):
+        requirements["special"].extend(["Weather effects coordinator", "SFX water/rain systems"])
+        requirements["equipment"].extend(["Weather protection for equipment", "Specialized lighting for weather"])
+        requirements["props"].append("Weather effects equipment")
+    
+    # Special effects requirements
+    if any(word in content_to_analyze for word in ["VIBRANIUM", "ENERGY", "GLOWING", "MAGIC", "EXPLOSION"]):
+        requirements["special"].extend(["VFX coordinator", "On-set VFX supervisor"])
+        requirements["equipment"].extend(["VFX markers", "High-speed cameras", "LED practical effects"])
+        requirements["props"].append("Practical VFX elements")
+    
+    # Enhanced technical cues analysis
     for cue in technical_cues:
         cue_upper = cue.upper()
         if any(word in cue_upper for word in ["CLOSE-UP", "MACRO", "DETAIL"]):
-            requirements["equipment"].append("Macro lens")
+            requirements["equipment"].append("Macro lens set")
         
         if any(word in cue_upper for word in ["CRANE", "DRONE", "AERIAL"]):
-            requirements["equipment"].append("Aerial equipment")
-            requirements["special"].append("Drone operator")
+            requirements["equipment"].append("Crane/drone equipment")
+            requirements["special"].append("Drone operator/crane operator")
         
         if any(word in cue_upper for word in ["STEADICAM", "HANDHELD"]):
-            requirements["equipment"].append("Steadicam")
+            requirements["equipment"].append("Steadicam rig")
             requirements["special"].append("Steadicam operator")
+        
+        if any(word in cue_upper for word in ["UNDERWATER", "SUBMERSIBLE"]):
+            requirements["equipment"].extend(["Underwater camera housing", "Underwater lighting"])
+            requirements["special"].extend(["Underwater safety divers", "Underwater camera operator"])
     
-    # Character count analysis
-    character_count = scene_data.get("character_count", 0)
+    # Character-based requirements
+    character_count = len(characters_in_scene)
     if character_count > 5:
-        requirements["cast"].append("Large ensemble scene")
-        requirements["special"].append("Additional ADs")
+        requirements["cast"].append(f"Large ensemble scene ({character_count} characters)")
+        requirements["special"].extend(["Additional ADs", "Crowd coordinator"])
+        requirements["equipment"].append("Multiple wireless mic systems")
+    elif character_count == 1:
+        requirements["cast"].append("Single character scene")
+        requirements["equipment"].append("Intimate lighting setup")
+    
+    # Use shooting notes for additional requirements
+    for note in shooting_notes:
+        note_upper = note.upper()
+        if "STUNT" in note_upper:
+            requirements["special"].append("Stunt coordination required")
+        if "VFX" in note_upper:
+            requirements["special"].append("VFX coordination required")
+        if "COVERAGE" in note_upper:
+            requirements["equipment"].append("Multiple camera setup")
+    
+    # Remove duplicates and sort
+    for key in requirements:
+        requirements[key] = sorted(list(set(requirements[key])))
     
     # Store in context
     tool_context.state[f"requirements_{scene_number}"] = requirements

@@ -185,7 +185,15 @@ def calculate_single_scene_tool(scene_data: Dict[str, Any], tool_context: ToolCo
         "estimated_shoot_hours": base_shoot_hours,
         "setup_hours": setup_hours,
         "wrap_hours": wrap_hours,
-        "total_hours": total_hours
+        "total_hours": total_hours,
+        # Pass through enhanced scene data if available
+        "scene_summary": scene_data.get("scene_summary", ""),
+        "location": scene_data.get("location", "Unknown"),
+        "location_type": scene_data.get("location_type", "INT"),
+        "time_of_day": scene_data.get("time_of_day", "DAY"),
+        "characters_in_scene": scene_data.get("characters_in_scene", []),
+        "technical_cues": scene_data.get("technical_cues", []),
+        "shooting_notes": scene_data.get("shooting_notes", [])
     }
     
     # Store in context
@@ -496,19 +504,35 @@ Always follow industry standards and provide detailed breakdowns for production 
             # Detect scenes within this page
             page_scenes = self._detect_scenes_in_page(page_text, page_num)
             
-            # If no scenes detected, create one scene for the entire page
+            # If no scenes detected, create one scene for the entire page with enhanced parsing
             if not page_scenes:
+                # Try to extract meaningful information from the page even without scene headers
+                characters = self._extract_characters_from_scene(page_text)
+                technical_cues = self._extract_technical_cues(page_text)
+                
+                # Try to infer location from content
+                location = self._infer_location_from_content(page_text)
+                
+                # Generate summary
+                scene_summary = self._generate_scene_summary(page_text, location)
+                
+                # Generate shooting notes
+                shooting_notes = self._generate_shooting_notes(page_text, location, characters)
+                
                 page_scenes = [{
                     "scene_number": f"P{page_num}",
-                    "location": f"PAGE {page_num}",
-                    "location_type": "INT",
+                    "location": location,
+                    "location_type": "INT",  # Default to interior
                     "time_of_day": "DAY",
                     "description": page_text,
+                    "scene_summary": scene_summary,
+                    "characters_in_scene": characters,
                     "eighths_on_page": 8.0,  # Full page = 8 eighths
                     "page_number": page_num,
-                    "character_count": len([line for line in page_lines if line.strip() and line.strip().isupper()]),
+                    "character_count": len(characters),
                     "dialogue_count": page_text.count('"'),
-                    "technical_cues": [line.strip() for line in page_lines if any(cue in line.upper() for cue in ['CAMERA', 'CUT', 'FADE', 'CLOSE-UP'])]
+                    "technical_cues": technical_cues,
+                    "shooting_notes": shooting_notes
                 }]
             
             scenes.extend(page_scenes)
@@ -548,11 +572,17 @@ Always follow industry standards and provide detailed breakdowns for production 
                 scene_line_count = len(scene_lines)
                 eighths_for_scene = (scene_line_count / total_lines) * 8.0
                 
-                # Parse header
-                parts = header.split('-') if '-' in header else [header]
-                location = parts[0].strip()
-                time_of_day = parts[-1].strip() if len(parts) > 1 else "DAY"
-                location_type = "EXT" if any(ext in location.upper() for ext in ['EXT', 'EXTERIOR']) else "INT"
+                # Enhanced parsing of scene header
+                location, time_of_day, location_type = self._parse_scene_header(header)
+                
+                # Generate scene summary from content
+                scene_summary = self._generate_scene_summary(scene_text, location)
+                
+                # Extract characters from scene
+                characters = self._extract_characters_from_scene(scene_text)
+                
+                # Extract technical elements
+                technical_cues = self._extract_technical_cues(scene_text)
                 
                 scene = {
                     "scene_number": f"P{page_num}S{i+1}",
@@ -560,15 +590,203 @@ Always follow industry standards and provide detailed breakdowns for production 
                     "location_type": location_type,
                     "time_of_day": time_of_day,
                     "description": scene_text,
+                    "scene_summary": scene_summary,
+                    "characters_in_scene": characters,
                     "eighths_on_page": round(eighths_for_scene, 2),
                     "page_number": page_num,
-                    "character_count": scene_text.count('\n') // 5,
+                    "character_count": len(characters),
                     "dialogue_count": scene_text.count('"'),
-                    "technical_cues": [line.strip() for line in scene_lines if any(cue in line.upper() for cue in ['CAMERA', 'CUT', 'FADE', 'CLOSE-UP'])]
+                    "technical_cues": technical_cues,
+                    "shooting_notes": self._generate_shooting_notes(scene_text, location, characters)
                 }
                 scenes.append(scene)
         
         return scenes
+    
+    def _parse_scene_header(self, header: str) -> tuple:
+        """Parse scene header to extract location, time of day, and location type."""
+        header = header.strip()
+        
+        # Default values
+        location = "UNKNOWN LOCATION"
+        time_of_day = "DAY"
+        location_type = "INT"
+        
+        # Extract location type (INT/EXT)
+        if header.upper().startswith(('EXT.', 'EXTERIOR')):
+            location_type = "EXT"
+        elif header.upper().startswith(('INT.', 'INTERIOR')):
+            location_type = "INT"
+        
+        # Split by common separators
+        parts = []
+        if ' - ' in header:
+            parts = header.split(' - ')
+        elif ' – ' in header:
+            parts = header.split(' – ')
+        elif '. ' in header:
+            parts = header.split('. ', 1)
+            parts[0] = parts[0] + '.'
+        
+        if len(parts) >= 2:
+            location = parts[0].strip()
+            time_part = parts[1].strip().upper()
+            
+            # Extract time of day
+            time_keywords = ['DAY', 'NIGHT', 'MORNING', 'EVENING', 'DUSK', 'DAWN', 'AFTERNOON', 'SUNSET', 'SUNRISE']
+            for keyword in time_keywords:
+                if keyword in time_part:
+                    time_of_day = keyword
+                    break
+            
+            # Clean up location
+            location = location.replace('INT.', '').replace('EXT.', '').replace('INTERIOR', '').replace('EXTERIOR', '').strip()
+        else:
+            # If no separator found, try to extract from the whole header
+            location = header.replace('INT.', '').replace('EXT.', '').replace('INTERIOR', '').replace('EXTERIOR', '').strip()
+        
+        return location, time_of_day, location_type
+    
+    def _generate_scene_summary(self, scene_text: str, location: str) -> str:
+        """Generate a brief summary of what happens in the scene."""
+        lines = scene_text.split('\n')
+        
+        # Look for action lines (non-dialogue, non-character name lines)
+        action_lines = []
+        for line in lines:
+            line = line.strip()
+            if line and not line.isupper() and not line.startswith('(') and not line.endswith(')'):
+                # Skip obvious character names and scene headers
+                if not any(marker in line.upper() for marker in ['INT.', 'EXT.', 'FADE', 'CUT TO']):
+                    action_lines.append(line)
+        
+        if action_lines:
+            # Take the first few action lines to create a summary
+            summary_lines = action_lines[:3]  # First 3 action lines
+            summary = ' '.join(summary_lines)
+            
+            # Truncate if too long
+            if len(summary) > 200:
+                summary = summary[:200] + "..."
+            
+            return summary
+        else:
+            return f"Scene takes place in {location}"
+    
+    def _extract_characters_from_scene(self, scene_text: str) -> List[str]:
+        """Extract character names from scene text."""
+        lines = scene_text.split('\n')
+        characters = []
+        
+        for line in lines:
+            line = line.strip()
+            # Character names are typically in ALL CAPS and on their own line
+            if line and line.isupper() and len(line) < 50:
+                # Filter out obvious non-character lines
+                if not any(marker in line for marker in [
+                    'INT.', 'EXT.', 'FADE', 'CUT TO', 'CAMERA', 'CLOSE-UP', 'WIDE SHOT',
+                    'ESTABLISHING', 'MONTAGE', 'FLASHBACK', 'DREAM SEQUENCE'
+                ]):
+                    # Remove parentheticals and common suffixes
+                    clean_name = line.replace('(CONT\'D)', '').replace('(O.S.)', '').replace('(V.O.)', '').strip()
+                    if clean_name and clean_name not in characters:
+                        characters.append(clean_name)
+        
+        return characters
+    
+    def _extract_technical_cues(self, scene_text: str) -> List[str]:
+        """Extract technical/camera cues from scene text."""
+        lines = scene_text.split('\n')
+        technical_cues = []
+        
+        technical_keywords = [
+            'CAMERA', 'CUT TO', 'FADE', 'CLOSE-UP', 'WIDE SHOT', 'MEDIUM SHOT',
+            'ESTABLISHING', 'MONTAGE', 'FLASHBACK', 'DREAM SEQUENCE', 'SLOW MOTION',
+            'ZOOM', 'PAN', 'TILT', 'DOLLY', 'CRANE', 'STEADICAM', 'HANDHELD'
+        ]
+        
+        for line in lines:
+            line = line.strip()
+            if any(keyword in line.upper() for keyword in technical_keywords):
+                technical_cues.append(line)
+        
+        return technical_cues
+    
+    def _generate_shooting_notes(self, scene_text: str, location: str, characters: List[str]) -> List[str]:
+        """Generate helpful shooting notes for the scene."""
+        notes = []
+        
+        # Character-based notes
+        if len(characters) > 3:
+            notes.append(f"Multi-character scene with {len(characters)} speaking roles - plan for coverage")
+        elif len(characters) == 1:
+            notes.append("Single character scene - focus on performance and close-ups")
+        
+        # Location-based notes
+        if "THRONE ROOM" in location.upper():
+            notes.append("Establish grandeur with wide shots, then move to character coverage")
+        elif "AIRCRAFT" in location.upper() or "PLANE" in location.upper():
+            notes.append("Consider green screen/LED wall for exterior views")
+        elif "LABORATORY" in location.upper() or "LAB" in location.upper():
+            notes.append("Highlight technology and scientific equipment in establishing shots")
+        elif "WAKANDA" in location.upper():
+            notes.append("Emphasize Afrofuturistic design elements and cultural details")
+        
+        # Technical notes based on content
+        if "fight" in scene_text.lower() or "battle" in scene_text.lower():
+            notes.append("Action sequence - coordinate with stunt team and plan safety measures")
+        
+        if "vibranium" in scene_text.lower():
+            notes.append("VFX sequence - coordinate with visual effects team for glowing effects")
+        
+        return notes
+    
+    def _infer_location_from_content(self, content: str) -> str:
+        """Infer location from content when no scene header is present."""
+        content_upper = content.upper()
+        
+        # Look for common location keywords
+        location_keywords = {
+            'THRONE ROOM': ['THRONE', 'KING', 'ROYAL', 'CEREMONIAL'],
+            'WAKANDA PALACE': ['WAKANDA', 'PALACE', 'AFROFUTURISTIC'],
+            'LABORATORY': ['LABORATORY', 'LAB', 'SCIENTIST', 'EXPERIMENT'],
+            'AIRCRAFT': ['AIRCRAFT', 'PLANE', 'FLYING', 'COCKPIT'],
+            'OFFICE': ['OFFICE', 'DESK', 'COMPUTER', 'MEETING'],
+            'WAREHOUSE': ['WAREHOUSE', 'STORAGE', 'CARGO'],
+            'STREET': ['STREET', 'ROAD', 'SIDEWALK', 'TRAFFIC'],
+            'FOREST': ['FOREST', 'TREES', 'WOODS', 'JUNGLE'],
+            'BEDROOM': ['BEDROOM', 'BED', 'SLEEPING'],
+            'KITCHEN': ['KITCHEN', 'COOKING', 'FOOD'],
+            'BATHROOM': ['BATHROOM', 'SHOWER', 'MIRROR'],
+            'GARAGE': ['GARAGE', 'CARS', 'MECHANIC'],
+            'HOSPITAL': ['HOSPITAL', 'DOCTOR', 'MEDICAL'],
+            'SCHOOL': ['SCHOOL', 'CLASSROOM', 'STUDENTS'],
+            'RESTAURANT': ['RESTAURANT', 'DINING', 'WAITER'],
+            'BANK': ['BANK', 'VAULT', 'MONEY'],
+            'CHURCH': ['CHURCH', 'PRAYER', 'ALTAR'],
+            'MUSEUM': ['MUSEUM', 'EXHIBIT', 'ARTIFACTS'],
+            'CASINO': ['CASINO', 'GAMBLING', 'CHIPS'],
+            'AIRPORT': ['AIRPORT', 'TERMINAL', 'GATE'],
+            'PRISON': ['PRISON', 'JAIL', 'CELL'],
+            'COURTROOM': ['COURTROOM', 'JUDGE', 'TRIAL']
+        }
+        
+        # Check for location keywords
+        for location, keywords in location_keywords.items():
+            if any(keyword in content_upper for keyword in keywords):
+                return location
+        
+        # Check for specific character-based locations
+        if 'T\'CHALLA' in content_upper or 'BLACK PANTHER' in content_upper:
+            if 'VIBRANIUM' in content_upper:
+                return 'WAKANDA VIBRANIUM MINES'
+            elif 'TRIBAL' in content_upper:
+                return 'WAKANDA TRIBAL MEETING'
+            else:
+                return 'WAKANDA LOCATION'
+        
+        # Default fallback
+        return 'UNDETERMINED LOCATION'
     
     def process_script_scenes(self, scenes_data: List[Dict[str, Any]]) -> Dict[str, Any]:
         """

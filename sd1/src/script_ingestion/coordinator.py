@@ -525,6 +525,27 @@ class ScriptIngestionCoordinator:
                     "total_pages": eighths_calc_data["totals"].get("total_pages", 0),
                     "complexity_breakdown": eighths_calc_data.get("breakdown_by_complexity", {})
                 }
+                
+                # Add enhanced scene details from the eighths calculator
+                if "scene_calculations" in eighths_calc_data:
+                    scene_details = []
+                    for calc in eighths_calc_data["scene_calculations"]:
+                        if "scene" in calc:
+                            scene = calc["scene"]
+                            scene_detail = {
+                                "scene_number": scene.get("scene_number", ""),
+                                "location": scene.get("location", ""),
+                                "scene_summary": scene.get("scene_summary", ""),
+                                "characters_in_scene": scene.get("characters_in_scene", []),
+                                "adjusted_eighths": scene.get("adjusted_eighths", 0),
+                                "estimated_hours": scene.get("estimated_shoot_hours", 0),
+                                "complexity_level": calc.get("complexity", {}).get("total_complexity", 1.0),
+                                "shooting_notes": scene.get("shooting_notes", [])
+                            }
+                            scene_details.append(scene_detail)
+                    
+                    if scene_details:
+                        reports["eighths_calculator"]["scene_details"] = scene_details
             
             # Timing analysis
             reports["timing_analysis"] = {

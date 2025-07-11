@@ -241,25 +241,69 @@ const DepartmentCard = ({
               </div>
             )}
 
-            {/* Scene Involvement */}
+            {/* Scene Involvement - Enhanced */}
             {totalScenes > 0 && (
               <div>
-                <h4 className="text-sm font-medium mb-3">Scene Involvement</h4>
-                <div className="space-y-2 max-h-32 overflow-y-auto">
+                <h4 className="text-sm font-medium mb-3">Scene Involvement Details</h4>
+                <div className="space-y-3 max-h-64 overflow-y-auto">
                   {data.scenes_requiring_department.slice(0, 5).map((scene, index) => (
-                    <div key={index} className="flex items-center justify-between text-sm">
-                      <span>Scene {scene.scene_number}</span>
-                      <div className="flex items-center gap-2">
-                        <InvolvementBadge level={scene.involvement_level} />
-                        <span className="text-muted-foreground">{scene.estimated_hours}h</span>
+                    <div key={index} className="p-3 border rounded-lg bg-muted/30">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="font-medium">Scene {scene.scene_number}</span>
+                        <div className="flex items-center gap-2">
+                          <InvolvementBadge level={scene.involvement_level} />
+                          <span className="text-sm text-muted-foreground">{scene.estimated_hours}h</span>
+                        </div>
                       </div>
+                      
+                      {/* Scene Complexity */}
+                      <div className="text-xs text-muted-foreground mb-2">
+                        Complexity: {scene.complexity}
+                      </div>
+                      
+                      {/* Specific Requirements - Enhanced */}
+                      {scene.specific_requirements && scene.specific_requirements.length > 0 && (
+                        <div className="mt-2">
+                          <div className="text-xs font-medium text-muted-foreground mb-1">
+                            Specific Requirements:
+                          </div>
+                          <div className="space-y-1">
+                            {scene.specific_requirements.map((req, reqIndex) => (
+                              <div key={reqIndex} className="text-xs bg-blue-50 dark:bg-blue-950/20 p-1.5 rounded text-blue-800 dark:text-blue-200">
+                                • {req}
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                      
+                      {/* No requirements indicator */}
+                      {(!scene.specific_requirements || scene.specific_requirements.length === 0) && (
+                        <div className="text-xs text-muted-foreground italic">
+                          Standard {name} department involvement
+                        </div>
+                      )}
                     </div>
                   ))}
                   {data.scenes_requiring_department.length > 5 && (
-                    <div className="text-xs text-muted-foreground text-center pt-2">
+                    <div className="text-xs text-muted-foreground text-center pt-2 border-t">
                       +{data.scenes_requiring_department.length - 5} more scenes
                     </div>
                   )}
+                </div>
+              </div>
+            )}
+
+            {/* Scheduling Notes - Enhanced */}
+            {data.scheduling_notes && data.scheduling_notes.length > 0 && (
+              <div>
+                <h4 className="text-sm font-medium mb-3">Scheduling Notes</h4>
+                <div className="space-y-2">
+                  {data.scheduling_notes.map((note, index) => (
+                    <div key={index} className="text-sm p-2 bg-yellow-50 dark:bg-yellow-950/20 rounded border-l-2 border-yellow-400">
+                      📅 {note}
+                    </div>
+                  ))}
                 </div>
               </div>
             )}

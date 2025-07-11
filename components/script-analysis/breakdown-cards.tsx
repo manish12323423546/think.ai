@@ -224,42 +224,99 @@ export function BreakdownCards({ breakdownCards, summaryStats }: BreakdownCardsP
                     </div>
                   </div>
 
-                  {/* Requirements */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {/* Equipment & Props */}
-                    {(card.equipment_needed.length > 0 || card.props_needed.length > 0) && (
+                  {/* Enhanced Requirements Grid */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    {/* Cast Requirements - Enhanced */}
+                    {card.cast_requirements.length > 0 && (
                       <div>
-                        <h4 className="text-sm font-medium mb-2">Equipment & Props</h4>
+                        <h4 className="text-sm font-medium mb-2 flex items-center">
+                          <Users className="w-4 h-4 mr-1" />
+                          Cast
+                        </h4>
                         <div className="space-y-1">
-                          {card.equipment_needed.map((item, i) => (
-                            <Badge key={i} variant="outline" className="mr-1 mb-1 text-xs">
-                              {item}
-                            </Badge>
+                          {card.cast_requirements.map((actor, i) => (
+                            <div key={i} className="text-xs bg-blue-50 dark:bg-blue-950/20 p-2 rounded border">
+                              {actor}
+                            </div>
                           ))}
-                          {card.props_needed.map((item, i) => (
-                            <Badge key={i} variant="outline" className="mr-1 mb-1 text-xs">
-                              {item}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Props - Enhanced */}
+                    {card.props_needed.length > 0 && (
+                      <div>
+                        <h4 className="text-sm font-medium mb-2">Props</h4>
+                        <div className="space-y-1">
+                          {card.props_needed.map((prop, i) => (
+                            <Badge key={i} variant="outline" className="mr-1 mb-1 text-xs bg-green-50 dark:bg-green-950/20">
+                              {prop}
                             </Badge>
                           ))}
                         </div>
                       </div>
                     )}
 
-                    {/* Special Requirements */}
-                    {card.special_requirements.length > 0 && (
+                    {/* Wardrobe - Enhanced */}
+                    {card.wardrobe_notes.length > 0 && (
                       <div>
-                        <h4 className="text-sm font-medium mb-2">Special Requirements</h4>
+                        <h4 className="text-sm font-medium mb-2">Wardrobe</h4>
                         <div className="space-y-1">
-                          {card.special_requirements.map((req, i) => (
-                            <div key={i} className="text-xs text-muted-foreground flex items-center">
-                              <AlertTriangle className="w-3 h-3 mr-1 text-orange-500" />
-                              {req}
+                          {card.wardrobe_notes.map((note, i) => (
+                            <div key={i} className="text-xs bg-purple-50 dark:bg-purple-950/20 p-2 rounded border">
+                              {note}
                             </div>
                           ))}
                         </div>
                       </div>
                     )}
+
+                    {/* Equipment - Enhanced */}
+                    {card.equipment_needed.length > 0 && (
+                      <div>
+                        <h4 className="text-sm font-medium mb-2">Equipment</h4>
+                        <div className="space-y-1">
+                          {card.equipment_needed.map((equipment, i) => (
+                            <Badge key={i} variant="outline" className="mr-1 mb-1 text-xs bg-orange-50 dark:bg-orange-950/20">
+                              {equipment}
+                            </Badge>
+                          ))}
+                        </div>
+                      </div>
+                    )}
                   </div>
+
+                  {/* Special Requirements - Enhanced */}
+                  {card.special_requirements.length > 0 && (
+                    <div className="mt-4">
+                      <h4 className="text-sm font-medium mb-2 flex items-center">
+                        <AlertTriangle className="w-4 h-4 mr-1 text-orange-500" />
+                        Special Requirements
+                      </h4>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                        {card.special_requirements.map((req, i) => (
+                          <div key={i} className="text-xs bg-red-50 dark:bg-red-950/20 p-2 rounded border border-red-200 dark:border-red-800 flex items-center">
+                            <AlertTriangle className="w-3 h-3 mr-2 text-red-500 flex-shrink-0" />
+                            {req}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Technical Notes - Enhanced */}
+                  {card.technical_notes.length > 0 && (
+                    <div className="mt-4">
+                      <h4 className="text-sm font-medium mb-2">Technical Notes</h4>
+                      <div className="space-y-1">
+                        {card.technical_notes.map((note, i) => (
+                          <div key={i} className="text-xs bg-gray-50 dark:bg-gray-950/20 p-2 rounded border">
+                            {note}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
 
                   {/* Crew Breakdown */}
                   <div className="mt-4 pt-3 border-t border-border">
