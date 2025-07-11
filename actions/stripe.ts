@@ -83,7 +83,7 @@ export const updateStripeCustomer = async (
     return result.data
   } catch (error) {
     const logger = createActionLogger('updateStripeCustomer', userId)
-    logger.error('Failed to update Stripe customer', error, { subscriptionId, customerId })
+    logger.error('Failed to update Stripe customer', error instanceof Error ? error : undefined, { subscriptionId, customerId })
     throw error instanceof Error
       ? error
       : new Error("Failed to update Stripe customer")
@@ -132,7 +132,7 @@ export const manageSubscriptionStatusChange = async (
     return membershipStatus
   } catch (error) {
     const logger = createActionLogger('manageSubscriptionStatusChange')
-    logger.error('Failed to manage subscription status change', error, { subscriptionId, customerId, productId })
+    logger.error('Failed to manage subscription status change', error instanceof Error ? error : undefined, { subscriptionId, customerId, productId })
     throw error instanceof Error
       ? error
       : new Error("Failed to update subscription status")
@@ -160,7 +160,7 @@ export const createCheckoutUrl = async (
     return { url: url.toString(), error: null }
   } catch (error) {
     const logger = createActionLogger('createCheckoutUrl', userId)
-    logger.error('Failed to create checkout URL', error, { paymentLinkUrl })
+    logger.error('Failed to create checkout URL', error instanceof Error ? error : undefined, { paymentLinkUrl })
     return {
       url: null,
       error:

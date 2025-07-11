@@ -15,7 +15,7 @@ const relevantEvents = new Set([
 
 export async function POST(req: Request) {
   const requestId = crypto.randomUUID()
-  const logger = createRequestLogger(req as any, requestId)
+  const logger = createRequestLogger(req as Request, requestId)
   
   logger.info('Processing Stripe webhook')
   

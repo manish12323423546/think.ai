@@ -27,7 +27,7 @@ export async function getCustomerByUserId(
     return customer || null
   } catch (error) {
     const logger = createActionLogger('getCustomerByUserId', userId)
-    logger.error('Database connection error', error)
+    logger.error('Database connection error', error instanceof Error ? error : undefined)
     // Return a default customer object to prevent app crashes
     return {
       id: userId,
@@ -80,7 +80,7 @@ export async function getBillingDataByUserId(userId: string): Promise<{
     }
   } catch (error) {
     const logger = createActionLogger('getBillingDataByUserId', userId)
-    logger.error('Database connection error', error)
+    logger.error('Database connection error', error instanceof Error ? error : undefined)
     const user = await currentUser()
     return {
       customer: null,

@@ -13,7 +13,7 @@ interface LogContext {
   requestId?: string
   component?: string
   action?: string
-  metadata?: Record<string, any>
+  metadata?: Record<string, unknown>
 }
 
 interface LogEntry {

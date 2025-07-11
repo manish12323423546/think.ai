@@ -447,7 +447,7 @@ export default function CharacterBreakdownPage() {
                       </thead>
                       <tbody>
                         {Object.entries(characterData.scene_matrix).map(([sceneId, sceneData]) => {
-                          const scene = sceneData as any;
+                          const scene = sceneData as { characters?: string[], present_characters?: string[], emotional_tone?: string };
                           const characters = scene.characters || scene.present_characters || [];
                           
                           return (
@@ -520,7 +520,7 @@ export default function CharacterBreakdownPage() {
                   <CardContent>
                     <div className="space-y-3">
                       {Object.entries(characterData.statistics?.dialogue_stats || {}).map(([charName, statData]) => {
-                        const dialogueStats = statData as any;
+                        const dialogueStats = statData as { total_lines?: number, total_words?: number };
                         return (
                           <div key={charName} className="text-sm">
                             <div className="flex justify-between font-medium">

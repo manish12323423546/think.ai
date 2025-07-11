@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -40,13 +40,13 @@ interface ScriptAnalysisData {
   success: boolean
   message: string
   timestamp: string
-  breakdown_cards: any[]
-  breakdown_summary: any
-  department_analysis: any
-  department_coordination: any
-  reports: any
+  breakdown_cards: Record<string, unknown>[]
+  breakdown_summary: Record<string, unknown>
+  department_analysis: Record<string, unknown>
+  department_coordination: Record<string, unknown>
+  reports: Record<string, unknown>
   processing_status: ProcessingStatus
-  saved_paths?: any
+  saved_paths?: Record<string, unknown>
 }
 
 const ProcessingIndicator = ({ status }: { status: ProcessingStatus | null }) => {
@@ -205,7 +205,7 @@ export default function ScriptAnalysisPage() {
   const [isProcessing, setIsProcessing] = useState(false)
 
   // Load analysis data from localStorage or API
-  const loadAnalysisData = async () => {
+  const loadAnalysisData = useCallback(async () => {
     try {
       setLoading(true)
       setError(null)
@@ -247,7 +247,7 @@ export default function ScriptAnalysisPage() {
       setError(err instanceof Error ? err.message : 'Failed to load analysis data')
       setLoading(false)
     }
-  }
+  }, [])
 
   // Process script through SD1 3-agent pipeline
   const processScript = async (scriptText: string, inputType: string = 'text') => {
@@ -339,7 +339,7 @@ export default function ScriptAnalysisPage() {
 
   useEffect(() => {
     loadAnalysisData()
-  }, [])
+  }, [loadAnalysisData])
 
   if (loading && !isProcessing) {
     return (
