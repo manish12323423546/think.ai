@@ -26,7 +26,7 @@ import { DepartmentAnalysis } from '@/components/script-analysis/department-anal
 import { Reports } from '@/components/script-analysis/reports'
 
 // API endpoint for SD1 backend
-const SD1_API_URL = '/api/sd1'
+const SD1_API_URL = 'https://thinkaiback.onrender.com/api'
 
 interface ProcessingStatus {
   status: string

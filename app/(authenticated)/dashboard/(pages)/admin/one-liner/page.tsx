@@ -8,7 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 
-const API_BASE_URL = 'http://localhost:8000'
+const API_BASE_URL = 'https://thinkaiback.onrender.com'
 const STORAGE_KEYS = {
   ONE_LINER_DATA: 'ONE_LINER_DATA',
 }

@@ -9,7 +9,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge'
 
 // API endpoint constant - direct to SD1 backend
-const SD1_API_URL = 'http://localhost:8000/api'
+const SD1_API_URL = 'https://thinkaiback.onrender.com/api'
 
 // Storage keys
 const STORAGE_KEYS = {

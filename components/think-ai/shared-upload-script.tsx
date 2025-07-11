@@ -12,7 +12,7 @@ import { RoleGate } from '@/components/auth/role-gate'
 import { Roles } from '@/types/globals'
 
 // API endpoint constant
-const API_BASE_URL = 'http://localhost:8000'
+const API_BASE_URL = 'https://thinkaiback.onrender.com'
 
 // Storage keys
 const STORAGE_KEYS = {

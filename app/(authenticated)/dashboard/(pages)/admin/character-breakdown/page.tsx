@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { cn } from '@/lib/utils'
 
-const API_BASE_URL = 'http://localhost:8000'
+const API_BASE_URL = 'https://thinkaiback.onrender.com'
 const STORAGE_KEYS = {
   CHARACTER_DATA: 'CHARACTER_DATA',
 }
