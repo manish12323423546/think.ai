@@ -151,6 +151,33 @@ async def ingest_script(request: ScriptRequest):
         logger.error(f"Error in script ingestion: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
+@app.post("/api/script/process")
+async def process_script_frontend(request: dict):
+    """Frontend-optimized script processing endpoint with 3-section data structure."""
+    try:
+        # Extract script data
+        script_text = request.get("script", "")
+        input_type = request.get("input_type", "text")
+        validation_level = request.get("validation_level", "lenient")
+        department_focus = request.get("department_focus", None)
+        
+        logger.info(f"Processing script for frontend: {len(script_text)} characters, type: {input_type}")
+        
+        # Process through 3-agent pipeline
+        result = await script_coordinator.process_script(
+            script_input=script_text,
+            input_type=input_type,
+            department_focus=department_focus,
+            validation_level=validation_level
+        )
+        
+        # Return formatted result (already formatted by _format_for_frontend)
+        return result
+        
+    except Exception as e:
+        logger.error(f"Error in frontend script processing: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
 # Frontend-compatible endpoints
 @app.post("/api/script/text")
 async def process_script_text(request: dict):
@@ -175,14 +202,33 @@ async def upload_script_file(file: UploadFile = File(...), validation_level: str
     try:
         # Read file content
         content = await file.read()
-        script_text = content.decode('utf-8')
         
-        result = await script_coordinator.process_script(
-            script_text,
-            None,  # department_focus
-            validation_level
-        )
-        return {"success": True, "data": result}
+        # Determine input type based on file extension
+        file_extension = file.filename.lower().split('.')[-1] if file.filename else ""
+        input_type = "pdf" if file_extension == "pdf" else "text"
+        
+        logger.info(f"Processing uploaded file: {file.filename}, type: {input_type}, size: {len(content)} bytes")
+        
+        # Process through 3-agent pipeline with proper PDF handling
+        if input_type == "pdf":
+            result = await script_coordinator.process_script(
+                script_input=content,  # Pass raw bytes for PDF
+                input_type="pdf",
+                department_focus=None,
+                validation_level=validation_level
+            )
+        else:
+            # Decode text files
+            script_text = content.decode('utf-8')
+            result = await script_coordinator.process_script(
+                script_input=script_text,
+                input_type="text",
+                department_focus=None,
+                validation_level=validation_level
+            )
+        
+        return result  # Return formatted result directly
+        
     except Exception as e:
         logger.error(f"Error in script file upload: {e}")
         raise HTTPException(status_code=500, detail=str(e))

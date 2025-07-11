@@ -1,0 +1,43 @@
+================================================================================
+COMPREHENSIVE ADK AGENT PIPELINE REPORT
+================================================================================
+Generated: 2025-07-11T12:21:13.160535
+Processing Timestamp: text_20250711_122113
+
+PROCESSING STATUS
+----------------------------------------
+Total Stages Completed: 0/3
+
+Errors:
+❌ ADKEighthsCalculatorAgent: Eighths calculation failed: No response from ADK agent
+❌ SceneBreakdownCardsAgent: Scene breakdown cards generation failed: No response received
+❌ DepartmentCoordinatorAgent: Department coordination failed: No response received
+
+SCRIPT STATISTICS
+----------------------------------------
+Total Scenes: 6
+Total Characters: 12
+Total Locations: 4
+
+AGENT RESULTS SUMMARY
+----------------------------------------
+ADK Eighths Calculator Agent:
+  ❌ Status: ERROR
+  📊 Error: Unknown error
+
+ADK Scene Breakdown Cards Agent:
+  ❌ Status: ERROR
+  📊 Error: Unknown error
+
+ADK Department Coordinator Agent:
+  ❌ Status: ERROR
+  📊 Error: Unknown error
+
+GENERATED FILES
+----------------------------------------
+main: data/scripts/script_20250711_122113.json
+metadata: data/scripts/metadata/metadata_20250711_122113.json
+
+================================================================================
+END OF REPORT
+================================================================================

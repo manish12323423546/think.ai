@@ -8,8 +8,8 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 
-// API endpoint constant - matching old UI exactly
-const API_BASE_URL = 'http://localhost:8000'
+// API endpoint constant - direct to SD1 backend
+const SD1_API_URL = 'http://localhost:8000/api'
 
 // Storage keys
 const STORAGE_KEYS = {
@@ -174,8 +174,8 @@ export default function UploadScriptPage() {
         formData.append('validation_level', 'lenient')
 
         try {
-          console.log('Making API call to:', `${API_BASE_URL}/api/script/upload`)
-          const response = await fetch(`${API_BASE_URL}/api/script/upload`, {
+          console.log('Making API call to:', `${SD1_API_URL}/script/upload`)
+          const response = await fetch(`${SD1_API_URL}/script/upload`, {
             method: 'POST',
             body: formData,
           })
@@ -191,16 +191,28 @@ export default function UploadScriptPage() {
           console.log('API Result:', result)
 
           if (!result.success) {
-            throw new Error(result.error || 'API returned error status')
+            throw new Error(result.message || result.error || 'API returned error status')
           }
 
-          // Save to local storage
-          localStorage.setItem(STORAGE_KEYS.SCRIPT_DATA, JSON.stringify(result.data))
+          // Save to local storage - store both original data and processed results
+          localStorage.setItem(STORAGE_KEYS.SCRIPT_DATA, JSON.stringify({
+            script_text: file.name,
+            file_name: file.name,
+            uploaded_at: new Date().toISOString()
+          }))
+          
+          // Store the full analysis results
+          localStorage.setItem('script_analysis_data', JSON.stringify(result))
           
           // Update context
-          updateScriptData(result.data)
+          updateScriptData(result)
           setSuccess('Script uploaded and analyzed successfully!')
           toast.success('Script uploaded and processed successfully!')
+          
+          // Redirect to analysis page after a short delay
+          setTimeout(() => {
+            window.location.href = '/dashboard/admin/script-analysis'
+          }, 2000)
         } catch (apiError) {
           console.warn('API call failed, using local storage:', apiError)
           
@@ -220,15 +232,17 @@ export default function UploadScriptPage() {
         }
       } else if (uploadMode === 'text' && scriptText) {
         try {
-          console.log('Making API call to:', `${API_BASE_URL}/api/script/text`)
-          const response = await fetch(`${API_BASE_URL}/api/script/text`, {
+          console.log('Making API call to:', `${SD1_API_URL}/script/process`)
+          const response = await fetch(`${SD1_API_URL}/script/process`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json'
             },
             body: JSON.stringify({
               script: scriptText,
-              validation_level: 'lenient'
+              input_type: 'text',
+              validation_level: 'lenient',
+              department_focus: ['camera', 'sound', 'lighting', 'art', 'wardrobe', 'special_effects']
             }),
           })
 
@@ -243,16 +257,28 @@ export default function UploadScriptPage() {
           console.log('API Result:', result)
 
           if (!result.success) {
-            throw new Error(result.error || 'API returned error status')
+            throw new Error(result.message || result.error || 'API returned error status')
           }
 
-          // Save to local storage
-          localStorage.setItem(STORAGE_KEYS.SCRIPT_DATA, JSON.stringify(result.data))
+          // Save to local storage - store both original data and processed results
+          localStorage.setItem(STORAGE_KEYS.SCRIPT_DATA, JSON.stringify({
+            script_text: scriptText,
+            input_type: 'text',
+            uploaded_at: new Date().toISOString()
+          }))
+          
+          // Store the full analysis results
+          localStorage.setItem('script_analysis_data', JSON.stringify(result))
           
           // Update context
-          updateScriptData(result.data)
+          updateScriptData(result)
           setSuccess('Script analyzed successfully!')
           toast.success('Script text processed successfully!')
+          
+          // Redirect to analysis page after a short delay
+          setTimeout(() => {
+            window.location.href = '/dashboard/admin/script-analysis'
+          }, 2000)
         } catch (apiError) {
           // Handle offline mode for text input
           const basicData = createBasicScriptData(scriptText)
@@ -453,7 +479,7 @@ export default function UploadScriptPage() {
             <div className="flex items-start space-x-2 text-sm">
               <AlertCircle className="h-4 w-4 text-blue-500 flex-shrink-0 mt-0.5" />
               <div className="text-blue-700">
-                <p>API Endpoint: {API_BASE_URL}/api</p>
+                <p>API Endpoint: {SD1_API_URL}</p>
                 <p>Connection Status: {isOffline ? 'Offline (Local Storage Mode)' : 'Online'}</p>
                 <p>Storage: Using browser local storage for data persistence</p>
               </div>

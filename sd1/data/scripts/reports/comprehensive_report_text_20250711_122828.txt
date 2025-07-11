@@ -1,0 +1,43 @@
+================================================================================
+COMPREHENSIVE ADK AGENT PIPELINE REPORT
+================================================================================
+Generated: 2025-07-11T12:28:28.062124
+Processing Timestamp: text_20250711_122828
+
+PROCESSING STATUS
+----------------------------------------
+Total Stages Completed: 0/3
+
+Errors:
+❌ ADKEighthsCalculatorAgent: Eighths calculation failed: ADK processing failed: __init__() missing 1 required positional argument: 'invocation_context'
+❌ SceneBreakdownCardsAgent: Scene breakdown cards generation failed: __init__() missing 1 required positional argument: 'invocation_context'
+❌ DepartmentCoordinatorAgent: Department coordination failed: __init__() missing 1 required positional argument: 'invocation_context'
+
+SCRIPT STATISTICS
+----------------------------------------
+Total Scenes: 6
+Total Characters: 12
+Total Locations: 4
+
+AGENT RESULTS SUMMARY
+----------------------------------------
+ADK Eighths Calculator Agent:
+  ❌ Status: ERROR
+  📊 Error: Unknown error
+
+ADK Scene Breakdown Cards Agent:
+  ❌ Status: ERROR
+  📊 Error: Unknown error
+
+ADK Department Coordinator Agent:
+  ❌ Status: ERROR
+  📊 Error: Unknown error
+
+GENERATED FILES
+----------------------------------------
+main: data/scripts/script_20250711_122828.json
+metadata: data/scripts/metadata/metadata_20250711_122828.json
+
+================================================================================
+END OF REPORT
+================================================================================
